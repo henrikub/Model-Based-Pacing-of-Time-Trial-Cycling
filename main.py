@@ -1,30 +1,31 @@
-# import gpxpy
-# import gpxpy.gpx
-# import pandas as pd
-# from parameters import *
+from tcxreader.tcxreader import TCXReader, TCXTrackPoint
+
+tcx_reader = TCXReader()
+file_location = 'Activities/FTP_test.tcx'
+
+data = tcx_reader.read(file_location)
+points = data.trackpoints
+
+print(points[3])
+print(points[3].tpx_ext['Watts'])
+print(points[3].tpx_ext['Speed'])
+print(points[3].latitude)
+print(points[3].longitude)
+print(points[3].elevation)
+print(points[3].distance)
+print(points[3].cadence)
+
+def get_data_from_activity(points):
+    distance = [point.distance for point in points]
+    elevation = [point.elevation for point in points]
+    latitude = [point.latitude for point in points]
+    longitude = [point.longitude for point in points]
+    heart_rate = [point.hr_value for point in points]
+    power = [point.tpx_ext['Watts'] for point in points]
+    speed = [point.tpx_ext['Speed'] for point in points]
+
+    return distance, elevation, latitude, longitude, heart_rate, power, speed
 
 
-# gpx_file = open('Activities/FTP_test.gpx', 'r', encoding="utf8")
-# gpx = gpxpy.parse(gpx_file)
-# points =  gpx.get_points_data()
-
-# dist = []
-# elevation = []
-# latitude = []
-# longitude = []
-# time = []
-# speed = []
-# heart_rate = []
-# for i in range(len(points)):
-#     dist.append(points[i].distance_from_start)
-#     elevation.append(points[i].point.elevation)
-#     latitude.append(points[i].point.latitude)
-#     longitude.append(points[i].point.longitude)
-#     speed.append(points[i].point.speed_between(points[i-1].point)* 60. ** 2 / 1000)
-
-
-# gpx.get_points_no()
-
-import tcxreader
-
-
+distance, elevation, latitude, longitude, heart_rate, power, speed = get_data_from_activity(points)
+print(distance, elevation, latitude, longitude, heart_rate, power, speed)
