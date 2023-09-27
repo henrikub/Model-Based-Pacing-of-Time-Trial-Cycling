@@ -1,31 +1,48 @@
-from tcxreader.tcxreader import TCXReader, TCXTrackPoint
+from activity_reader import ActivityReader
+act = ActivityReader("FTP_test.tcx")
+distance, time, elevation, latitude, longitude, heart_rate, cadence, power, speed = act.get_activity_data()
 
-tcx_reader = TCXReader()
-file_location = 'Activities/FTP_test.tcx'
-
-data = tcx_reader.read(file_location)
-points = data.trackpoints
-
-print(points[3])
-print(points[3].tpx_ext['Watts'])
-print(points[3].tpx_ext['Speed'])
-print(points[3].latitude)
-print(points[3].longitude)
-print(points[3].elevation)
-print(points[3].distance)
-print(points[3].cadence)
-
-def get_data_from_activity(points):
-    distance = [point.distance for point in points]
-    elevation = [point.elevation for point in points]
-    latitude = [point.latitude for point in points]
-    longitude = [point.longitude for point in points]
-    heart_rate = [point.hr_value for point in points]
-    power = [point.tpx_ext['Watts'] for point in points]
-    speed = [point.tpx_ext['Speed'] for point in points]
-
-    return distance, elevation, latitude, longitude, heart_rate, power, speed
+# from athletic_pandas.models import Athlete, WorkoutDataFrame
+# import matplotlib.pyplot as plt
 
 
-distance, elevation, latitude, longitude, heart_rate, power, speed = get_data_from_activity(points)
-print(distance, elevation, latitude, longitude, heart_rate, power, speed)
+# wdf = WorkoutDataFrame(dict(
+#     power=power
+# ))
+# wdf.athlete = Athlete(cp=350, w_prime=20000)
+
+# fig_power = wdf.power.plot.area()
+# fig_power.set_ylabel('power (Watt)')
+# fig_power.set_xlabel('time (seconds)')
+# wdf = wdf.assign(
+#     w_balance_skiba=wdf.compute_w_prime_balance('skiba'),
+#     w_balance_waterworth=wdf.compute_w_prime_balance('waterworth'),
+#     w_balance_froncioni_skiba_clarke=wdf.compute_w_prime_balance('froncioni-skiba-clarke'),
+# )
+# fig_skiba_waterworth = wdf.loc[:, ['w_balance_skiba', 'w_balance_waterworth']].plot(ylim=0)
+# fig_skiba_waterworth.set_ylabel('W\'balance (Joule)')
+# fig_skiba_waterworth.set_xlabel('time (seconds)')
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import sweat
+
+data = pd.DataFrame(dict(power=power), index=time)
+
+# Define the model coefficients
+cp = 230
+w_prime = 15000
+
+data["W'balance"] = sweat.w_prime_balance(data["power"], cp=cp, w_prime=w_prime).to_list()
+
+plt.subplot(3,1,1)
+plt.plot(distance, data["W'balance"])
+
+plt.subplot(3,1,2)
+plt.plot(distance, power)
+plt.plot(distance, [cp]*len(distance))
+
+plt.subplot(3,1,3)
+plt.plot(distance, elevation)
+plt.show()
+
