@@ -1,5 +1,6 @@
 from tcxreader.tcxreader import TCXReader, TCXTrackPoint
 import matplotlib.pyplot as plt
+import datetime
 
 class ActivityReader():
     def __init__(self, filename):
@@ -10,7 +11,8 @@ class ActivityReader():
 
     def get_activity_data(self):
         distance = [point.distance for point in self.points]
-        time = [point.time for point in self.points]
+        datetime = [point.time for point in self.points]
+        time = [(dt - datetime[0]).total_seconds() for dt in datetime]
         elevation = [point.elevation for point in self.points]
         latitude = [point.latitude for point in self.points]
         longitude = [point.longitude for point in self.points]
