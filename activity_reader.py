@@ -1,6 +1,4 @@
-from tcxreader.tcxreader import TCXReader, TCXTrackPoint
-import matplotlib.pyplot as plt
-import datetime
+from tcxreader.tcxreader import TCXReader
 
 class ActivityReader():
     def __init__(self, filename):
