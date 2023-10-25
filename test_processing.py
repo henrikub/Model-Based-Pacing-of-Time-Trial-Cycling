@@ -9,6 +9,8 @@ def find_last_active_datapoint(power, approx_time):
 def remove_unactive_period(approx_time, power, *args):
     """
     Remove unactive time in an activity. Unactive is defined as power below 100W.
+    Returns:
+        A tuple with power as the first element, followed by the other variables passed in *args.
     
     """
     last_datapoint = find_last_active_datapoint(power, approx_time)
