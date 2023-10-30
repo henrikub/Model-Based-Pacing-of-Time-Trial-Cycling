@@ -58,6 +58,7 @@ data_points = [
     (power_test4, time_test4)
 ]
 
+
 power_points = np.array([power_test1, power_test2, power_test3, power_test4])
 time_points = np.array([time_test1, time_test2, time_test3, time_test4])
 
