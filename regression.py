@@ -20,27 +20,35 @@ def exp_model(t, CP, P_max, tau):
 
 def regression(function, power, time):
     if function == linear_p:
-        initial_guess = (10000, 300)
+        initial_guess = (20000, 300)
         return curve_fit(linear_p, time, power, p0=initial_guess, bounds=(0,[50000,1000]))
 
     if function == linear_tw:
-        initial_guess = (10000, 300)
+        initial_guess = (20000, 300)
         return curve_fit(linear_tw, time, time*power, p0=initial_guess, bounds=(0, [50000, 1000]))
  
     if function == nonlinear_2:
-        initial_guess = (10000, 300)
+        initial_guess = (20000, 300)
         return curve_fit(nonlinear_2, power, time)
 
     if function == nonlinear_3:
         initial_guess = (20000, 300, 500)
-        return curve_fit(nonlinear_3, power, time, p0=initial_guess, bounds=(0, [40000, 500, 1000]))
+        return curve_fit(nonlinear_3, power, time, p0=initial_guess)
     
     if function == exp_model:
-        initial_guess = (300, 500, 1)
-        return curve_fit(exp_model, time, power, p0=initial_guess, bounds=(0, [1000, 2000, 10]))
+        initial_guess = (300, 500, 0.1)
+        return curve_fit(exp_model, time, power, p0=initial_guess)
+    
 
-power_test1 = 417
-time_test1 = 180
+def calculate_r_squared(y_points, x_points, fitted_model):
+    ssr = np.sum((y_points - [fitted_model[x_points]])**2)
+    sst = np.sum((y_points - np.mean(y_points))**2)
+
+    return 1 - (ssr / sst)
+
+
+power_test1 = 392
+time_test1 = 170
 
 power_test2 = 345
 time_test2 = 340
@@ -48,19 +56,17 @@ time_test2 = 340
 power_test3 = 298
 time_test3 = 776
 
-power_test4 = 285
-time_test4 = 1200
 
 data_points = [
     (power_test1, time_test1),
     (power_test2, time_test2),
-    (power_test3, time_test3),
-    (power_test4, time_test4)
+    (power_test3, time_test3)
 ]
 
 
-power_points = np.array([power_test1, power_test2, power_test3, power_test4])
-time_points = np.array([time_test1, time_test2, time_test3, time_test4])
+power_points = np.array([power_test1, power_test2, power_test3])
+time_points = np.array([time_test1, time_test2, time_test3])
+
 
 params_linear_p, covariance_linear_p = regression(linear_p, power_points, time_points)
 awc_linear_p, cp_linear_p = params_linear_p
@@ -96,6 +102,7 @@ fitted_linear_tw = linear_tw(time, awc_linear_tw, cp_linear_tw)
 fitted_nl2 = nonlinear_2(power, awc_nl2, cp_nl2)
 fitted_nl3 = nonlinear_3(power, awc_nl3, cp_nl3, p_max_nl3)
 fitted_exp = exp_model(time, cp_exp, p_max_exp, tau_exp)
+
 
 plt.subplot(3, 2 ,1)
 plt.plot(1/time, fitted_linear_p)

@@ -3,7 +3,7 @@ import numpy as np
 
 def find_last_active_datapoint(power, approx_time):
     for i in range(approx_time, len(power)):
-        if power[i] < 300:
+        if power[i] < 100:
             return i
 
 def remove_unactive_period(approx_time, power, *args):
