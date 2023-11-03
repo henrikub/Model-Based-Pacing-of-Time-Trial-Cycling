@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import sweat
 import numpy as np
 from plotting import *
-from test_processing import *
 from activity_reader import ActivityReader
 
 act = ActivityReader("300W_test.tcx")
