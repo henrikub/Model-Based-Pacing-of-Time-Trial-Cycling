@@ -47,8 +47,8 @@ def calculate_r_squared(y_points, x_points, fitted_model):
     return 1 - (ssr / sst)
 
 
-power_test1 = 392
-time_test1 = 170
+power_test1 = 400
+time_test1 = 200
 
 power_test2 = 345
 time_test2 = 340
