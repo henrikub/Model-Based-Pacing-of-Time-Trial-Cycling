@@ -32,11 +32,11 @@ def regression(function, power, time):
         return curve_fit(nonlinear_2, power, time)
 
     if function == nonlinear_3:
-        initial_guess = (20000, 300, 500)
-        return curve_fit(nonlinear_3, power, time, p0=initial_guess)
+        initial_guess = (20000, 250, 1000)
+        return curve_fit(nonlinear_3, power, time, p0=initial_guess, bounds = ([10000, 230, 300], [30000, 300, 5000]))
     
     if function == exp_model:
-        initial_guess = (300, 500, 0.1)
+        initial_guess = (250, 3000, 0.1)
         return curve_fit(exp_model, time, power, p0=initial_guess)
     
 
@@ -47,8 +47,8 @@ def calculate_r_squared(y_points, x_points, fitted_model):
     return 1 - (ssr / sst)
 
 
-power_test1 = 400
-time_test1 = 200
+power_test1 = 392
+time_test1 = 170
 
 power_test2 = 345
 time_test2 = 340
@@ -56,16 +56,20 @@ time_test2 = 340
 power_test3 = 298
 time_test3 = 776
 
+power_test4 = 289
+time_test4 = 1103
+
 
 data_points = [
     (power_test1, time_test1),
     (power_test2, time_test2),
-    (power_test3, time_test3)
+    (power_test3, time_test3),
+    (power_test4, time_test4)
 ]
 
 
-power_points = np.array([power_test1, power_test2, power_test3])
-time_points = np.array([time_test1, time_test2, time_test3])
+power_points = np.array([power_test1, power_test3, power_test4])
+time_points = np.array([time_test1, time_test3, time_test4])
 
 
 params_linear_p, covariance_linear_p = regression(linear_p, power_points, time_points)
@@ -125,8 +129,8 @@ text_ltw = f'CP = {round(cp_linear_tw)}W\nAWC = {round(awc_linear_tw/1000,2)}kJ'
 plt.text(0.8, 0.5, text_ltw, ha='center', va='center', transform=plt.gca().transAxes)
 for p, t in data_points:
     plt.plot(t, p*t, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
-plt.xlim(0,1000)
-plt.ylim(0,300000)
+plt.xlim(0,1200)
+plt.ylim(0,400000)
 
 plt.subplot(3,2,3)
 plt.plot(power, fitted_nl2)
@@ -153,7 +157,7 @@ plt.xlim(270,500)
 plt.ylim(0,1200)
 
 plt.subplot(3,2,5)
-plt.plot(power, fitted_nl3)
+plt.plot(fitted_exp[0:500], power)
 plt.title("Exp model")
 plt.xlabel("Power [W]")
 plt.ylabel("Time [s]")
@@ -165,3 +169,5 @@ plt.xlim(270,500)
 plt.ylim(0,1200)
 
 plt.show()
+print(len(fitted_exp))
+print(len(fitted_linear_tw))
