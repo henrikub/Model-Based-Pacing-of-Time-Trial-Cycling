@@ -18,6 +18,9 @@ def nonlinear_3(P, AWC, CP, P_max):
 def exp_model(t, CP, P_max, tau):
     return CP + (P_max-CP)*np.exp(-t/tau)
 
+def nonlinear_4(P, AWC, CP, P_max, tau):
+    return AWC/(P-CP) + AWC/(P_max-CP) - CP*tau*(P-CP)
+
 def regression(function, power, time):
     if function == linear_p:
         initial_guess = (20000, 300)
@@ -36,11 +39,15 @@ def regression(function, power, time):
         return curve_fit(nonlinear_3, power, time, p0=initial_guess, bounds = ([10000, 230, 300], [30000, 300, 5000]))
     
     if function == exp_model:
-        initial_guess = (250, 3000, 0.1)
-        return curve_fit(exp_model, time, power, p0=initial_guess)
+        initial_guess = (250, 1000, 0.1)
+        return curve_fit(exp_model, time, power, p0=initial_guess, bounds = ([200, 500, 0], [500, 5000, 10]))
+    
+    if function == nonlinear_4:
+        initial_guess = (20000, 250, 1000, 0.1)
+        return curve_fit(nonlinear_4, power, time, p0=initial_guess, bounds=([10000, 230, 500, 0], [30000, 300, 5000, 10]))
     
 
-def calculate_r_squared(y_points, x_points, fitted_model):
+def r_squared(y_points, x_points, fitted_model):
     ssr = np.sum((y_points - [fitted_model[x_points]])**2)
     sst = np.sum((y_points - np.mean(y_points))**2)
 
@@ -68,8 +75,8 @@ data_points = [
 ]
 
 
-power_points = np.array([power_test1, power_test3, power_test4])
-time_points = np.array([time_test1, time_test3, time_test4])
+power_points = np.array([power_test1, power_test2, power_test3, power_test4])
+time_points = np.array([time_test1, time_test2, time_test3, time_test4])
 
 
 params_linear_p, covariance_linear_p = regression(linear_p, power_points, time_points)
@@ -99,6 +106,14 @@ print(f"CP for {exp_model} is {round(cp_exp, 2)}W")
 print(f"P_max for {exp_model} is {round(p_max_exp, 2)}W")
 print(f"Tau for {exp_model} is {round(tau_exp, 2)}")
 
+params_nl4, covariance_nl4 = regression(nonlinear_4, power_points, time_points)
+awc_nl4, cp_nl4, p_max_nl4, tau_nl4 = params_nl4
+print(f"AWC for {nonlinear_4} is {round(awc_nl4/1000, 2)}kJ")
+print(f"CP for {nonlinear_4} is {round(cp_nl4, 2)}W")
+print(f"P_max for {nonlinear_4} is {round(p_max_nl4, 2)}W")
+print(f"Tau for {nonlinear_4} is {round(tau_nl4, 2)}")
+
+
 time = np.arange(1,1200)
 power = np.arange(0,500)
 fitted_linear_p = linear_p(time, awc_linear_p, cp_linear_p)
@@ -106,7 +121,7 @@ fitted_linear_tw = linear_tw(time, awc_linear_tw, cp_linear_tw)
 fitted_nl2 = nonlinear_2(power, awc_nl2, cp_nl2)
 fitted_nl3 = nonlinear_3(power, awc_nl3, cp_nl3, p_max_nl3)
 fitted_exp = exp_model(time, cp_exp, p_max_exp, tau_exp)
-
+fitted_nl4 = nonlinear_4(power, awc_nl4, cp_nl4, p_max_nl4, tau_nl4)
 
 plt.subplot(3, 2 ,1)
 plt.plot(1/time, fitted_linear_p)
@@ -157,7 +172,7 @@ plt.xlim(270,500)
 plt.ylim(0,1200)
 
 plt.subplot(3,2,5)
-plt.plot(fitted_exp[0:500], power)
+plt.plot(fitted_exp)
 plt.title("Exp model")
 plt.xlabel("Power [W]")
 plt.ylabel("Time [s]")
@@ -168,6 +183,31 @@ for p, t in data_points:
 plt.xlim(270,500)
 plt.ylim(0,1200)
 
+plt.subplot(3,2,6)
+plt.plot(power, fitted_nl4)
+plt.title("Nonlinear-4")
+plt.xlabel("Power [W]")
+plt.ylabel("Time [s]")
+text_nl4 = f'CP = {round(cp_nl4)}W\nAWC = {round(awc_nl4/1000,2)}kJ\nP_max = {round(p_max_nl4)}W\ntau = {tau_nl4}'
+plt.text(0.8, 0.5, text_nl4, ha='center', va='center', transform=plt.gca().transAxes)
+for p, t in data_points:
+    plt.plot(p, t, marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+plt.xlim(270,500)
+plt.ylim(0,1200)
+
 plt.show()
-print(len(fitted_exp))
-print(len(fitted_linear_tw))
+
+# Calculation of R-squared
+r_squared_ltw = r_squared(power_points*time_points, time_points, fitted_linear_tw)
+r_squared_lp = r_squared(power_points, time_points, fitted_linear_p)
+r_squared_nl2 = r_squared(time_points, power_points, fitted_nl2)
+r_squared_nl3 = r_squared(time_points, power_points, fitted_nl3)
+r_squared_exp = r_squared(power_points, time_points, fitted_exp)
+r_squared_nl4 = r_squared(time_points, power_points, fitted_nl4)
+
+print(r_squared_ltw)
+print(r_squared_lp)
+print(r_squared_nl2)
+print(r_squared_nl3)
+print(r_squared_exp)
+print(r_squared_nl4)
