@@ -40,4 +40,43 @@ def bi_conditional_w_bal(power, cp, awc):
         w_bal_current = w_bal_next
     return w_bal
 
+def bi_exponential_w_bal(power, cp, awc):
+    w_bal = []
+    w_bal_current = awc
+    w_bal_next = 0
+    fc_amp = awc*(0.75*0.4+5.26)
+    sc_amp = awc-fc_amp    
+    # vet ikke hvordan disse skal defineres:
+    fc_bal = 0.5
+    sc_bal = 0.5
+    length_of_interval = np.zeros(len(power))
 
+    # todo: make an array that has the same length as the power output, and contains the length of the current exp/rec interval
+    for i in range(len(power)):
+
+        if power[i] >= cp:
+            exp_interval = 0
+            for j in range(i,len(power)):
+                if power[j] < cp:
+                    exp_interval = j-i
+                    length_of_interval[i:exp_interval] = exp_interval
+                    break
+
+            w_bal_next = awc - ((max(0,power[i]-cp))*exp_interval*fc_bal)/w_bal_current - ((max(0,power[i]-cp))*exp_interval*sc_bal)/w_bal_current
+        
+        else:
+            for j in range(i,len(power)):
+                if power[j] > cp:
+                    rec_interval = j-i
+ 
+                    length_of_interval[i:rec_interval] = rec_interval
+                    break
+            w_bal_next = (fc_amp-fc_bal)*(1-np.exp(-rec_interval/(45*np.exp(-0.014*(power[i]/cp))+9999*np.exp(-0.811*(power[i]/cp))))) + (sc_amp-sc_bal)*(1-np.exp(-rec_interval/(9999*np.exp(-0.098*(power[i]/cp))+429)))
+        
+        w_bal.append(w_bal_next)
+        w_bal_current = w_bal_next
+        print(length_of_interval)
+    return w_bal
+
+
+        
