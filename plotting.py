@@ -11,7 +11,7 @@ def compare_power(power_data, distance, legends):
     plt.title("Comparison of power")
     plt.show()
 
-def plot_regression(power_points, time_points, fitted_ltw, fitted_lp, fitted_nl2, fitted_nl3, fitted_exp, fitted_nl4):
+def plot_regression(power_points, time_points, fitted_ltw, fitted_lp, fitted_nl2, fitted_nl3, fitted_nl4):
     time = np.arange(1,1200)
     power = np.arange(0,500)
     
@@ -57,16 +57,6 @@ def plot_regression(power_points, time_points, fitted_ltw, fitted_lp, fitted_nl2
     plt.ylim(0,1200)
 
     plt.subplot(3,2,5)
-    plt.plot(time, fitted_exp)
-    plt.title("Exp model")
-    plt.xlabel("Power [W]")
-    plt.ylabel("Time [s]")
-    for i in range(len(power_points)):
-        plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
-    plt.xlim(270,500)
-    plt.ylim(0,1200)
-
-    plt.subplot(3,2,6)
     plt.plot(power, fitted_nl4)
     plt.title("Nonlinear-4")
     plt.xlabel("Power [W]")
