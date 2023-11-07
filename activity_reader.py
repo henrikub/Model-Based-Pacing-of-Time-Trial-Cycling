@@ -2,6 +2,10 @@ from tcxreader.tcxreader import TCXReader
 
 class ActivityReader():
     def __init__(self, filename):
+        """Initializes an instance of the class and reads the data from the TCX file.
+        The arrays for distance, time, elevation, latitude, longitude, heart rate, cadence, power and speed
+        are stored as class variables. 
+        """
         tcx_reader = TCXReader()
         file_location = 'Activities/' + filename
         data = tcx_reader.read(file_location)
@@ -18,10 +22,8 @@ class ActivityReader():
         self.speed = []
         self.get_activity_data()
 
-        self.avg_power = 0
-        self.total_time = 0
-
     def get_activity_data(self):
+        """Extracts the relevant data from the TCXTrackpoints objects an store them as arrays."""
         self.distance = [point.distance for point in self.points]
         datetime = [point.time for point in self.points]
         self.time = [(dt - datetime[0]).total_seconds() for dt in datetime]
@@ -34,6 +36,7 @@ class ActivityReader():
         self.speed = [point.tpx_ext['Speed'] for point in self.points]
 
     def find_last_active_datapoint(self, approx_time):
+        """Finds last data point after a certain amount of time where the power is above 100W. """
         for i in range(approx_time, len(self.power)):
             if self.power[i] < 100:
                 return i

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
-def compare_power(power_data, distance, legends, title):
+def compare_power(power_data, distance, legends, title=None):
     for power in power_data:
         plt.plot(distance, power)
 
