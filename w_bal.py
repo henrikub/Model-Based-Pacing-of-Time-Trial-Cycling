@@ -86,8 +86,8 @@ def bi_exponential_w_bal(power, cp, awc, recovery_param):
     fc_amp = awc*(0.75*recovery_param + 5.26)
     sc_amp = awc-fc_amp    
     # vet ikke hvordan disse skal defineres:
-    fc_bal = 0.000003
-    sc_bal = 0.00004
+    fc_bal = 0.5
+    sc_bal = 0.5
     length_of_interval = count_above_or_below_threshold(power, cp)
 
     # todo: make an array that has the same length as the power output, and contains the length of the current exp/rec interval
@@ -102,7 +102,6 @@ def bi_exponential_w_bal(power, cp, awc, recovery_param):
         w_bal.append(w_bal_next)
         w_bal_current = w_bal_next
 
-    print(length_of_interval)
     return w_bal
 
 
