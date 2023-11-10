@@ -71,5 +71,6 @@ print(f"R-squared for the Nonlinear-2 model is {round(r_squared_nl2,3)}")
 print(f"R-squared for the Nonlinear-3 model is {round(r_squared_nl3,3)}")
 print(f"R-squared for the Nonlinear-4 model is {round(r_squared_nl4,3)}\n")
 
+# Find mean and SD for CP and W'
 print(f"Mean and SD for CP is {round(np.mean([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]))}W and {round(np.std([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]), 2)}")
 print(f"Mean and SD for W' is {round(np.mean([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]))}W and {round(np.std([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]), 2)}")
