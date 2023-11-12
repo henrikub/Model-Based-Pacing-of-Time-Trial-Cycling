@@ -21,6 +21,13 @@ compare_power([w_bal_waterworth, w_bal_fsc], act.time, legends=["waterworth", "f
 print(min(w_bal_fsc))
 print(min(w_bal_waterworth))
 
+w_bal_bi_exp = bi_exponential_w_bal(act.power, cp, w_prime, 0.46)
+
+plt.plot(w_bal_bi_exp)
+
+plt.legend(['bi exp'])
+plt.show()
+
 # test = sweat.w_prime_balance(data["power"], cp=cp, algorithm='skiba', w_prime=w_prime).to_list()
 # test = integral_w_bal(act.power, cp, w_prime)
 # plt.plot(test)
