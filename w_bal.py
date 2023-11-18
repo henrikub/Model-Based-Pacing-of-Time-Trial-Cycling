@@ -77,25 +77,38 @@ def tau_sc(power, cp, untill = None):
     return 9999* math.e ** (-0.098 * d_cp) + 429
 
 
-def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=0.46, tau_dynamic=False, tau_value=None, *args, **kwargs):
-    last = w_prime
+def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=46, tau_dynamic=False, tau_value=None, *args, **kwargs):
+    last_w_bal = w_prime
     w_prime_balance = []
-    FC_amp = w_prime * (0.75 * rec_parameter + 5.26)
+    FC_amp = (w_prime * (0.75 * rec_parameter + 5.26))/100
     SC_amp = w_prime - FC_amp
     tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
+    FC_bal = FC_amp - 0.01
+    SC_bal = SC_amp -0.01
 
     for t in range(len(power)):
-
+        print(f"For t= {t}, SC_amp is {SC_amp} and FC_amp is {FC_amp}")
         for u, p in enumerate(power[: t + 1]):
             if p >= cp: 
-                new = w_prime - ((p-cp) * t * w_prime * FC_amp / last) - ((p-cp) * t * w_prime*SC_amp / last) 
+                FC_update = -((p-cp) * t * FC_bal / last_w_bal)
+                SC_update = -((p-cp) * t * SC_bal / last_w_bal)
+                new_w_bal = w_prime + FC_update + SC_update
             else: 
-                new = (FC_amp - w_prime*FC_amp) * (1 - math.e ** (-t/tau_fc(t))) + (SC_amp - w_prime*SC_amp) * (1 - math.e ** (-t/tau_sc(t)))
+                FC_update = (FC_bal - FC_amp) * math.e ** (-t/tau_fc(t))
+                SC_update = (SC_bal - SC_amp) * math.e ** (-t/tau_sc(t))
+                print(f"tau FC = {tau_fc(t)}, tau SC = {tau_sc(t)}")
+                new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
                 
-
-        w_prime_balance.append(new)
-        last = new
+        w_prime_balance.append(new_w_bal)
+        print("Last W_bal: ",last_w_bal)
+        last_w_bal = new_w_bal
+        FC_bal += FC_update
+        SC_bal += SC_update
+        print("FC update ", FC_update)
+        print("SC update: ", SC_update)
+        print("New FC_bal: ", FC_bal)
+        print("New SC_bal: ", SC_bal)
 
     return pd.Series(w_prime_balance)
 

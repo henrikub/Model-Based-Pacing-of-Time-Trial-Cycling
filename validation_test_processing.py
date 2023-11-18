@@ -73,8 +73,8 @@ compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], va
 val1_power = pd.DataFrame(dict(power=val_test_1.power), index=val_test_1.time)
 val2_power = pd.DataFrame(dict(power=val_test_2.power), index=val_test_2.time)
 
-w_bal_dif_val1 = differential_w_bal(val_test_1.power, cp, awc)
-w_bal_dif_val2 = differential_w_bal(val_test_2.power, cp, awc)
+w_bal_dif_val1 = w_prime_balance_ode(val_test_1.power, cp, awc)
+w_bal_dif_val2 = w_prime_balance_ode(val_test_2.power, cp, awc)
 w_bal_int_val1 = sweat.w_prime_balance(val1_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
 w_bal_int_val2 = sweat.w_prime_balance(val2_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
 
