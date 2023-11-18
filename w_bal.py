@@ -60,7 +60,7 @@ def tau_fc(power, cp, untill = None):
     avg_power_below_cp = power[:untill][power[:untill] < cp].mean()
     if math.isnan(avg_power_below_cp):
         avg_power_below_cp = 0
-    d_cp = avg_power_below_cp/cp
+    d_cp = avg_power_below_cp/cp *100
 
     return 45 * math.e ** (-0.014 * d_cp) + 9999 * math.e ** (-0.811 * d_cp)
 
@@ -72,7 +72,7 @@ def tau_sc(power, cp, untill = None):
     avg_power_below_cp = power[:untill][power[:untill] < cp].mean()
     if math.isnan(avg_power_below_cp):
         avg_power_below_cp = 0
-    d_cp = avg_power_below_cp/cp
+    d_cp = avg_power_below_cp/cp *100
 
     return 9999* math.e ** (-0.098 * d_cp) + 429
 
@@ -80,37 +80,39 @@ def tau_sc(power, cp, untill = None):
 def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=46, tau_dynamic=False, tau_value=None, *args, **kwargs):
     last_w_bal = w_prime
     w_prime_balance = []
+    FC_balance = []
+    SC_balance = []
     FC_amp = (w_prime * (0.75 * rec_parameter + 5.26))/100
     SC_amp = w_prime - FC_amp
     tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
-    FC_bal = FC_amp - 0.01
-    SC_bal = SC_amp -0.01
+    FC_bal = FC_amp
+    SC_bal = SC_amp 
+    new_FC_bal = 0
+    new_SC_bal = 0
 
     for t in range(len(power)):
-        print(f"For t= {t}, SC_amp is {SC_amp} and FC_amp is {FC_amp}")
+        print(f"\nt = {t} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
         for u, p in enumerate(power[: t + 1]):
+            #print(f"u = {u} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
             if p >= cp: 
-                FC_update = -((p-cp) * t * FC_bal / last_w_bal)
-                SC_update = -((p-cp) * t * SC_bal / last_w_bal)
-                new_w_bal = w_prime + FC_update + SC_update
+                new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
+                new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
+                new_w_bal = w_prime - ((p-cp) * t * FC_bal / last_w_bal) - ((p-cp) * t * SC_bal / last_w_bal)
             else: 
-                FC_update = (FC_bal - FC_amp) * math.e ** (-t/tau_fc(t))
-                SC_update = (SC_bal - SC_amp) * math.e ** (-t/tau_sc(t))
-                print(f"tau FC = {tau_fc(t)}, tau SC = {tau_sc(t)}")
+                new_FC_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t)))
+                new_SC_bal = (SC_amp - SC_bal) * math.e ** (-t/tau_sc(t))
                 new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
-                
-        w_prime_balance.append(new_w_bal)
-        print("Last W_bal: ",last_w_bal)
-        last_w_bal = new_w_bal
-        FC_bal += FC_update
-        SC_bal += SC_update
-        print("FC update ", FC_update)
-        print("SC update: ", SC_update)
-        print("New FC_bal: ", FC_bal)
-        print("New SC_bal: ", SC_bal)
 
-    return pd.Series(w_prime_balance)
+        w_prime_balance.append(new_w_bal)
+        FC_balance.append(new_FC_bal)
+        SC_balance.append(new_SC_bal)
+        last_w_bal = new_w_bal
+
+        FC_bal = new_FC_bal
+        SC_bal = new_SC_bal
+
+    return (pd.Series(w_prime_balance), FC_balance, SC_balance)
 
 
 def w_prime_balance_waterworth(
