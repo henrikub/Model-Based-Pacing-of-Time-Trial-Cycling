@@ -173,36 +173,80 @@ def w_prime_balance_bi_exp(
 ):
 
     w_prime_balance = []
+    FC_bal = []
+    SC_bal = []
+    FC_amp = 0.3679*w_prime
+    SC_amp = 0.6324*w_prime
     tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
-    # tau_fc = 15
-    # tau_sc = 400
-    alpha_1 = 3.5
-    alpha_2 = 1.2
+    FC = 4.4
+    SC = 0.9
 
     for t in range(len(power)):
         w_prime_exp_sum = 0
+        FC_exp_sum = 0
+        SC_exp_sum = 0
 
         for u, p in enumerate(power[: t + 1]):
             w_prime_exp = max(0, p - cp)
-            w_prime_exp_sum += w_prime_exp * (alpha_1 * np.power(np.e, (u - t) / tau_fc(t)) +  alpha_2 * np.power(np.e, (u - t) / tau_sc(t)))
-            
+            FC_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc(t)))
+            SC_exp_sum += w_prime_exp * (SC * np.power(np.e, (u - t) / tau_sc(t)))
+        
+        w_prime_exp_sum = FC_exp_sum + SC_exp_sum
         w_prime_balance.append(w_prime - w_prime_exp_sum)
+        FC_bal.append(FC_amp - FC_exp_sum)
+        SC_bal.append(SC_amp - SC_exp_sum)
 
-    return pd.Series(w_prime_balance)
+    return w_prime_balance, FC_bal, SC_bal
 
 
-def w_prime_balance_bi_exp_reg(power, FC, SC, tau_fc, tau_sc):
+def w_prime_balance_bi_exp_2(
+    power, cp, w_prime, tau_dynamic=False, tau_value=None, *args, **kwargs
+):
+
+    w_prime_balance = []
+    FC_bal = []
+    SC_bal = []
+    FC_amp = 0.3679*w_prime
+    SC_amp = 0.6324*w_prime
+    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
+    FC = 3
+    SC = 1.5
+
+    for t in range(len(power)):
+        w_prime_exp_sum = 0
+        FC_exp_sum = 0
+        SC_exp_sum = 0
+        for u, p in enumerate(power[: t + 1]):
+            if p < cp:
+                FC_exp_sum += (p-cp) * (FC * np.power(np.e, (u - t) / tau_fc(t)))
+                SC_exp_sum += (p-cp) * (SC * np.power(np.e, (u - t) / tau_sc(t)))
+            else:
+                FC_exp_sum -= (cp-p)/2
+                SC_exp_sum -= (cp-p)/2
+            
+        w_prime_exp_sum = FC_exp_sum + SC_exp_sum
+        w_prime_balance.append(w_prime - w_prime_exp_sum)
+        FC_bal.append(FC_amp - FC_exp_sum)
+        SC_bal.append(SC_amp - SC_exp_sum)
+
+    return w_prime_balance, FC_bal, SC_bal
+
+
+def w_prime_balance_bi_exp_reg(power, FC, SC):
     cp = 265
     w_prime = 26630
     w_prime_balance = []
+    tau_fc = get_bi_exp_tau_method(power, cp, False, None, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, False, None, fast_component=False)
 
     for t in range(len(power)):
         w_prime_exp_sum = 0
 
         for u, p in enumerate(power[: t + 1]):
             w_prime_exp = max(0, p - cp)
-            w_prime_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc) +  SC * np.power(np.e, (u - t) / tau_sc))
+            w_prime_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc(t)) +  SC * np.power(np.e, (u - t) / tau_sc(t)))
             
         w_prime_balance.append(w_prime - w_prime_exp_sum)
 

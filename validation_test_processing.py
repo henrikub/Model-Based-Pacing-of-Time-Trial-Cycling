@@ -79,6 +79,8 @@ w_bal_int_val1 = w_prime_balance(val1_power["power"], cp=cp, algorithm='waterwor
 w_bal_int_val2 = w_prime_balance(val2_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
 w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, awc)
 w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, awc)
+w_bal_biexp_val1, _, _ = w_prime_balance_bi_exp(val1_power["power"], cp, awc)
+w_bal_biexp_val2, _, _ = w_prime_balance_bi_exp(val2_power["power"], cp, awc)
 
 fig, ax1 = plt.subplots()
 plt.xlabel("Time [s]")
@@ -89,9 +91,10 @@ ax2.set_ylabel("Heart rate [bpm]", color='tab:red')
 ax1.plot(val_test_1.time, w_bal_dif_val1)
 ax1.plot(val_test_1.time, w_bal_int_val1)
 ax1.plot(val_test_1.time, w_bal_bart_val1)
+ax1.plot(val_test_1.time, w_bal_biexp_val1)
 ax2.plot(val_test_1.time, val_test_1.heart_rate, color='tab:red')
 ax2.tick_params(axis='y', labelcolor='tab:red')
-ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart'])
+ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart', 'Bi exp'])
 ax2.legend(['Heart rate'])
 plt.show()
 
@@ -104,9 +107,10 @@ ax2.set_ylabel("Heart rate [bpm]", color='tab:red')
 ax1.plot(val_test_2.time, w_bal_dif_val2)
 ax1.plot(val_test_2.time, w_bal_int_val2)
 ax1.plot(val_test_2.time, w_bal_bart_val2)
+ax1.plot(val_test_2.time, w_bal_biexp_val2)
 ax2.plot(val_test_2.time, val_test_2.heart_rate, color='tab:red')
 ax2.tick_params(axis='y', labelcolor='tab:red')
-ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart'])
+ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart', 'Bi exp'])
 ax2.legend(['Heart rate'])
 plt.show()
 
@@ -131,12 +135,19 @@ rec2_predicted_int_val1 = w_bal_int_val1[846]-w_bal_int_val1[602]
 rec1_predicted_int_val2 = w_bal_int_val2[319]-w_bal_int_val2[282]
 rec2_predicted_int_val2 = w_bal_int_val2[423]-w_bal_int_val2[388]
 
-# Predicted by bartbart algorithm
+# Predicted by bart algorithm
 rec1_predicted_bart_val1 = w_bal_bart_val1[488]-w_bal_bart_val1[248]
 rec2_predicted_bart_val1 = w_bal_bart_val1[846]-w_bal_bart_val1[602]
 
 rec1_predicted_bart_val2 = w_bal_bart_val2[319]-w_bal_bart_val2[282]
 rec2_predicted_bart_val2 = w_bal_bart_val2[423]-w_bal_bart_val2[388]
+
+# Predicted by bi exp algorithm
+rec1_predicted_biexp_val1 = w_bal_biexp_val1[488]-w_bal_biexp_val1[248]
+rec2_predicted_biexp_val1 = w_bal_biexp_val1[846]-w_bal_biexp_val1[602]
+
+rec1_predicted_biexp_val2 = w_bal_biexp_val2[319]-w_bal_biexp_val2[282]
+rec2_predicted_biexp_val2 = w_bal_biexp_val2[423]-w_bal_biexp_val2[388]
 
 
 print(f"Rec 1 val1, actual = {rec1_actual_val1}. predicted dif = {rec1_predicted_dif_val1}, predicted int = {rec1_predicted_int_val1}")
@@ -146,14 +157,16 @@ actual_recs = [rec1_actual_val1, rec2_actual_val1, rec1_actual_val2, rec2_actual
 predicted_dif_recs = [rec1_predicted_dif_val1, rec2_predicted_dif_val1, rec1_predicted_dif_val2, rec2_predicted_dif_val2]
 predicted_int_recs = [rec1_predicted_int_val1, rec2_predicted_int_val1, rec1_predicted_int_val2, rec2_predicted_int_val2]
 predicted_bart_recs = [rec1_predicted_bart_val1, rec2_predicted_bart_val1, rec1_predicted_bart_val2, rec2_predicted_bart_val2]
+predicted_biexp_recs = [rec1_predicted_biexp_val1, rec2_predicted_biexp_val1, rec1_predicted_biexp_val2, rec2_predicted_biexp_val2]
 
-width = 0.15
+width = 0.1
 x = np.arange(4)
 plt.bar(x-0.2, np.array(actual_recs)/awc*100, width)
-plt.bar(x, np.array(predicted_dif_recs)/awc*100, width)
-plt.bar(x+0.2, np.array(predicted_int_recs)/awc*100, width)
-plt.bar(x+0.4, np.array(predicted_bart_recs)/awc*100, width)
+plt.bar(x-0.1, np.array(predicted_dif_recs)/awc*100, width)
+plt.bar(x, np.array(predicted_int_recs)/awc*100, width)
+plt.bar(x+0.1, np.array(predicted_bart_recs)/awc*100, width)
+plt.bar(x+0.2, np.array(predicted_biexp_recs)/awc*100, width)
 plt.xticks(x, ['Recovery 1: 240s', 'Recovery 2: 240s', 'Recovery 1: 30s', 'Recovery 2: 30s'])
-plt.legend(['Actual', 'Differential algorithm', 'Integral algorithm', 'Bart'])
+plt.legend(['Actual', 'Differential algorithm', 'Integral algorithm', 'Bart', 'Bi exp'])
 plt.ylabel("W' reconstitution (%)")
 plt.show()
