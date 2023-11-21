@@ -77,7 +77,7 @@ def tau_sc(power, cp, untill = None):
     return 9999* math.e ** (-0.098 * d_cp) + 429
 
 
-def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=46, tau_dynamic=False, tau_value=None, *args, **kwargs):
+def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=42, tau_dynamic=False, tau_value=None, *args, **kwargs):
     last_w_bal = w_prime
     w_prime_balance = []
     FC_balance = []
@@ -92,6 +92,7 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=46, tau_dynamic
     new_SC_bal = 0
 
     for t in range(len(power)):
+        print(f"percentage FC = {FC_amp/w_prime} percentage SC = {SC_amp/w_prime}")
         print(f"\nt = {t} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
         for u, p in enumerate(power[: t + 1]):
             #print(f"u = {u} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
@@ -100,8 +101,9 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=46, tau_dynamic
                 new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
                 new_w_bal = w_prime - ((p-cp) * t * FC_bal / last_w_bal) - ((p-cp) * t * SC_bal / last_w_bal)
             else: 
+                print(f"tau fc = {tau_fc(t)} tau sc = {tau_sc(t)}")
                 new_FC_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t)))
-                new_SC_bal = (SC_amp - SC_bal) * math.e ** (-t/tau_sc(t))
+                new_SC_bal = (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
                 new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
 
         w_prime_balance.append(new_w_bal)
@@ -171,23 +173,40 @@ def w_prime_balance_bi_exp(
 ):
 
     w_prime_balance = []
-    tau_1 = get_tau_method(power, cp, tau_dynamic, 22)
-    tau_2 = get_tau_method(power, cp, tau_dynamic, 377)
-    A = 1
-    alpha_1 = 0.477
-    alpha_2 = 1-alpha_1
+    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
+    # tau_fc = 15
+    # tau_sc = 400
+    alpha_1 = 3.5
+    alpha_2 = 1.2
 
     for t in range(len(power)):
         w_prime_exp_sum = 0
 
         for u, p in enumerate(power[: t + 1]):
             w_prime_exp = max(0, p - cp)
-            w_prime_exp_sum += w_prime_exp * (A*alpha_1 * np.power(np.e, (u - t) / tau_1(t)) +  A*alpha_2 * np.power(np.e, (u - t) / tau_2(t)))
-
+            w_prime_exp_sum += w_prime_exp * (alpha_1 * np.power(np.e, (u - t) / tau_fc(t)) +  alpha_2 * np.power(np.e, (u - t) / tau_sc(t)))
+            
         w_prime_balance.append(w_prime - w_prime_exp_sum)
 
     return pd.Series(w_prime_balance)
 
+
+def w_prime_balance_bi_exp_reg(power, FC, SC, tau_fc, tau_sc):
+    cp = 265
+    w_prime = 26630
+    w_prime_balance = []
+
+    for t in range(len(power)):
+        w_prime_exp_sum = 0
+
+        for u, p in enumerate(power[: t + 1]):
+            w_prime_exp = max(0, p - cp)
+            w_prime_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc) +  SC * np.power(np.e, (u - t) / tau_sc))
+            
+        w_prime_balance.append(w_prime - w_prime_exp_sum)
+
+    return pd.Series(w_prime_balance)
 
 def w_prime_balance_froncioni_skiba_clarke(power, cp, w_prime):
     """
@@ -218,6 +237,25 @@ def w_prime_balance_ode(power, cp, w_prime):
         if p < cp:
             new = w_prime - (w_prime - last) * np.power(np.e, -(cp - p)/w_prime)
 
+        elif p == cp:
+            new = last
+        else:
+            new = last - (p - cp)
+
+        w_prime_balance.append(new)
+        last = new
+
+    return pd.Series(w_prime_balance)
+
+
+def w_prime_balance_bart(power, cp, w_prime):
+
+    last = w_prime
+    w_prime_balance = []
+
+    for p in power:
+        if p < cp:
+            new = w_prime - (w_prime - last) * np.power(np.e, -1/(2287.2*(cp-p)**-0.688))
         elif p == cp:
             new = last
         else:

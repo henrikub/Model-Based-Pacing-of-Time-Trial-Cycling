@@ -75,8 +75,10 @@ val2_power = pd.DataFrame(dict(power=val_test_2.power), index=val_test_2.time)
 
 w_bal_dif_val1 = w_prime_balance_ode(val_test_1.power, cp, awc)
 w_bal_dif_val2 = w_prime_balance_ode(val_test_2.power, cp, awc)
-w_bal_int_val1 = sweat.w_prime_balance(val1_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
-w_bal_int_val2 = sweat.w_prime_balance(val2_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
+w_bal_int_val1 = w_prime_balance(val1_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
+w_bal_int_val2 = w_prime_balance(val2_power["power"], cp=cp, algorithm='waterworth', w_prime=awc).to_list()
+w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, awc)
+w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, awc)
 
 fig, ax1 = plt.subplots()
 plt.xlabel("Time [s]")
@@ -86,9 +88,10 @@ ax2 = ax1.twinx()
 ax2.set_ylabel("Heart rate [bpm]", color='tab:red')
 ax1.plot(val_test_1.time, w_bal_dif_val1)
 ax1.plot(val_test_1.time, w_bal_int_val1)
+ax1.plot(val_test_1.time, w_bal_bart_val1)
 ax2.plot(val_test_1.time, val_test_1.heart_rate, color='tab:red')
 ax2.tick_params(axis='y', labelcolor='tab:red')
-ax1.legend(['Differential algorithm', 'Integral algorithm'])
+ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart'])
 ax2.legend(['Heart rate'])
 plt.show()
 
@@ -100,9 +103,10 @@ ax2 = ax1.twinx()
 ax2.set_ylabel("Heart rate [bpm]", color='tab:red')
 ax1.plot(val_test_2.time, w_bal_dif_val2)
 ax1.plot(val_test_2.time, w_bal_int_val2)
+ax1.plot(val_test_2.time, w_bal_bart_val2)
 ax2.plot(val_test_2.time, val_test_2.heart_rate, color='tab:red')
 ax2.tick_params(axis='y', labelcolor='tab:red')
-ax1.legend(['Differential algorithm', 'Integral algorithm'])
+ax1.legend(['Differential algorithm', 'Integral algorithm', 'Bart'])
 ax2.legend(['Heart rate'])
 plt.show()
 
@@ -127,6 +131,12 @@ rec2_predicted_int_val1 = w_bal_int_val1[846]-w_bal_int_val1[602]
 rec1_predicted_int_val2 = w_bal_int_val2[319]-w_bal_int_val2[282]
 rec2_predicted_int_val2 = w_bal_int_val2[423]-w_bal_int_val2[388]
 
+# Predicted by bartbart algorithm
+rec1_predicted_bart_val1 = w_bal_bart_val1[488]-w_bal_bart_val1[248]
+rec2_predicted_bart_val1 = w_bal_bart_val1[846]-w_bal_bart_val1[602]
+
+rec1_predicted_bart_val2 = w_bal_bart_val2[319]-w_bal_bart_val2[282]
+rec2_predicted_bart_val2 = w_bal_bart_val2[423]-w_bal_bart_val2[388]
 
 
 print(f"Rec 1 val1, actual = {rec1_actual_val1}. predicted dif = {rec1_predicted_dif_val1}, predicted int = {rec1_predicted_int_val1}")
@@ -135,14 +145,15 @@ print(f"Rec 1 val2, actual = {rec1_actual_val2}. predicted dif = {rec1_predicted
 actual_recs = [rec1_actual_val1, rec2_actual_val1, rec1_actual_val2, rec2_actual_val2]
 predicted_dif_recs = [rec1_predicted_dif_val1, rec2_predicted_dif_val1, rec1_predicted_dif_val2, rec2_predicted_dif_val2]
 predicted_int_recs = [rec1_predicted_int_val1, rec2_predicted_int_val1, rec1_predicted_int_val2, rec2_predicted_int_val2]
+predicted_bart_recs = [rec1_predicted_bart_val1, rec2_predicted_bart_val1, rec1_predicted_bart_val2, rec2_predicted_bart_val2]
 
-width = 0.2
+width = 0.15
 x = np.arange(4)
-plt.bar(x-0.2, actual_recs, width)
-plt.bar(x, predicted_dif_recs, width)
-plt.bar(x+0.2, predicted_int_recs, width)
+plt.bar(x-0.2, np.array(actual_recs)/awc*100, width)
+plt.bar(x, np.array(predicted_dif_recs)/awc*100, width)
+plt.bar(x+0.2, np.array(predicted_int_recs)/awc*100, width)
+plt.bar(x+0.4, np.array(predicted_bart_recs)/awc*100, width)
 plt.xticks(x, ['Recovery 1: 240s', 'Recovery 2: 240s', 'Recovery 1: 30s', 'Recovery 2: 30s'])
-plt.legend(['Actual', 'Differential algorithm', 'Integral algorithm'])
-plt.title("W' recovery")
-plt.ylabel("W' [J]")
+plt.legend(['Actual', 'Differential algorithm', 'Integral algorithm', 'Bart'])
+plt.ylabel("W' reconstitution (%)")
 plt.show()
