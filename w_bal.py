@@ -107,9 +107,6 @@ def w_prime_balance_ode(power, cp, w_prime):
     for p in power:
         if p < cp:
             new = w_prime - (w_prime - last) * np.power(np.e, -(cp - p)/w_prime)
-
-        elif p == cp:
-            new = last
         else:
             new = last - (p - cp)
 
@@ -127,8 +124,6 @@ def w_prime_balance_bart(power, cp, w_prime):
     for p in power:
         if p < cp:
             new = w_prime - (w_prime - last) * np.power(np.e, -1/(2287.2*(cp-p)**-0.688))
-        elif p == cp:
-            new = last
         else:
             new = last - (p - cp)
 
@@ -152,26 +147,28 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=42, tau_dynamic
     new_FC_bal = 0
     new_SC_bal = 0
 
-    for t in range(len(power)):
-        print(f"percentage FC = {FC_amp/w_prime} percentage SC = {SC_amp/w_prime}")
+    for t, p in enumerate(power):
         print(f"\nt = {t} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
-        for u, p in enumerate(power[: t + 1]):
-            #print(f"u = {u} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
-            if p >= cp: 
-                new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
-                new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
-                new_w_bal = w_prime - ((p-cp) * t * FC_bal / last_w_bal) - ((p-cp) * t * SC_bal / last_w_bal)
-            else: 
-                print(f"tau fc = {tau_fc(t)} tau sc = {tau_sc(t)}")
-                new_FC_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t)))
-                new_SC_bal = (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
-                new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** (-t/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
+        #for u, p in enumerate(power[: t + 1]):
+        if p > cp: 
+            new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
+            new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
+            new_w_bal = new_FC_bal + new_SC_bal
+        else: 
+            # new_FC_bal = (FC_amp - FC_bal) * (1 - math.e ** ((u-t)/tau_fc(t)))
+            # new_SC_bal = (SC_amp - SC_bal) * (1 - math.e ** ((u-t)/tau_sc(t)))
+            # new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** ((u-t)/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
+            print(f"for t = {t} tau fc = {tau_fc(t)} and tau sc = {tau_sc(t)}")
+            new_FC_bal += (FC_amp-FC_bal) * (1- math.e ** (-t/tau_fc(t)))
+            new_SC_bal += (SC_amp-SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
+            print(f"for t = {t}, recharge of FC bal = {new_FC_bal-FC_bal}, recharge of SC bal ={new_SC_bal-SC_bal}")
+            new_w_bal = new_FC_bal + new_SC_bal
 
         w_prime_balance.append(new_w_bal)
         FC_balance.append(new_FC_bal)
         SC_balance.append(new_SC_bal)
-        last_w_bal = new_w_bal
 
+        last_w_bal = new_w_bal
         FC_bal = new_FC_bal
         SC_bal = new_SC_bal
 
