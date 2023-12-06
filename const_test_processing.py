@@ -1,6 +1,8 @@
 from activity_reader import ActivityReader
 import numpy as np
 from regression import *
+from w_bal import *
+import matplotlib.pyplot as plt
 from plotting import plot_regression
 
 # Read the constant power tests
@@ -79,3 +81,20 @@ print(f"R-squared for the Nonlinear-4 model is {round(r_squared_nl4,3)}\n")
 # Find mean and SD for CP and W'
 print(f"Mean and SD for CP is {round(np.mean([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]))}W and {round(np.std([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]), 2)}")
 print(f"Mean and SD for W' is {round(np.mean([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]))}W and {round(np.std([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]), 2)}")
+
+# Plot the w'bal for the constant tests
+w_bal_test1 = w_prime_balance_ode(test1_activity.power, cp_nl3, awc_nl3)
+w_bal_test2 = w_prime_balance_ode(test2_activity.power, cp_nl3, awc_nl3)
+w_bal_test3 = w_prime_balance_ode(test3_activity.power, cp_nl3, awc_nl3)
+w_bal_test4 = w_prime_balance_ode(test4_activity.power, cp_nl3, awc_nl3)
+print(f"Remaining w_bal where: 300W: {w_bal_test1[-1]}, 400W: {w_bal_test2[-1]}, 350W: {w_bal_test3[-1]}, 290W: {w_bal_test4[-1]}")
+
+plt.title("W'bal constant power output tests")
+plt.plot(w_bal_test1)
+plt.plot(w_bal_test2)
+plt.plot(w_bal_test3)
+plt.plot(w_bal_test4)
+plt.legend(['300W: 554J remaining', '400W: -565J remaining', '350W: 4796J remaining', '290W: -874J remaining'])
+plt.ylabel("W'balance [J]")
+plt.xlabel("Time [s]")
+plt.show()

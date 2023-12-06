@@ -113,7 +113,7 @@ def w_prime_balance_ode(power, cp, w_prime):
         w_prime_balance.append(new)
         last = new
 
-    return pd.Series(w_prime_balance)
+    return w_prime_balance
 
 
 def w_prime_balance_bart(power, cp, w_prime):
