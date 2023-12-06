@@ -10,6 +10,7 @@ test1_activity = ActivityReader("300W_test.tcx")
 test2_activity = ActivityReader("350W_test.tcx")
 test3_activity = ActivityReader("400W_test.tcx")
 test4_activity = ActivityReader("290W_test.tcx")
+retest_activity = ActivityReader("300W_retest.tcx")
 
 activities = [test1_activity, test2_activity, test3_activity, test4_activity]
 
@@ -18,6 +19,7 @@ test1_activity.remove_unactive_period(600)
 test2_activity.remove_unactive_period(200)
 test3_activity.remove_unactive_period(100)
 test4_activity.remove_unactive_period(800)
+retest_activity.remove_unactive_period(600)
 
 # Print some statistics from each test
 for i, act in enumerate(activities):
@@ -87,14 +89,17 @@ w_bal_test1 = w_prime_balance_ode(test1_activity.power, cp_nl3, awc_nl3)
 w_bal_test2 = w_prime_balance_ode(test2_activity.power, cp_nl3, awc_nl3)
 w_bal_test3 = w_prime_balance_ode(test3_activity.power, cp_nl3, awc_nl3)
 w_bal_test4 = w_prime_balance_ode(test4_activity.power, cp_nl3, awc_nl3)
-print(f"Remaining w_bal where: 300W: {w_bal_test1[-1]}, 400W: {w_bal_test2[-1]}, 350W: {w_bal_test3[-1]}, 290W: {w_bal_test4[-1]}")
+w_bal_retest = w_prime_balance_ode(retest_activity.power, cp_nl3, awc_nl3)
 
 plt.title("W'bal constant power output tests")
 plt.plot(w_bal_test1)
 plt.plot(w_bal_test2)
 plt.plot(w_bal_test3)
 plt.plot(w_bal_test4)
-plt.legend(['300W: 554J remaining', '400W: -565J remaining', '350W: 4796J remaining', '290W: -874J remaining'])
+plt.plot(w_bal_retest)
+plt.legend([f'298W: {round(w_bal_test1[-1])}J remaining', f'345W: {round(w_bal_test2[-1])}J remaining', 
+            f'392W: {round(w_bal_test3[-1])}J remaining', f'289W: {round(w_bal_test4[-1])}J remaining', 
+            f'299W(retest): {round(w_bal_retest[-1])}J remaining'], loc='upper right')
 plt.ylabel("W'balance [J]")
 plt.xlabel("Time [s]")
 plt.show()

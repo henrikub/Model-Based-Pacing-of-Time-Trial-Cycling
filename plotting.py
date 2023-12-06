@@ -2,10 +2,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
-def compare_power(power_data, time, legends, title=None):
-    for power in power_data:
-        plt.plot(time, power)
-
+def compare_power(power_data, time=None, legends=None, title=None):
+    if time != None:
+        for power in power_data:
+            plt.plot(time, power)
+    else:
+        for power in power_data:
+            plt.plot(power)
+            
     plt.legend(legends)
     plt.xlabel("Time [s]")
     plt.ylabel("Power [W]")

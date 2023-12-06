@@ -69,6 +69,18 @@ compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], va
 avg_power_val2 = len(work_bout_1_val2)*[np.average(work_bout_1_val2)] + len(recovery_1_val2)*[np.average(recovery_1_val2)] + len(work_bout_2_val2)*[np.average(work_bout_2_val2)]+ len(recovery_2_val2)*[np.average(recovery_2_val2)]+ len(work_bout_3_val2)*[np.average(work_bout_3_val2)]
 compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', 'CP'], 'Validation test 30s recovery')
 
+# Finding the average of the first work bout and recovery
+avg_work_rec_val1 = np.mean(np.concatenate((work_bout_1_val1,recovery_1_val1)))
+avg_work_rec_val2 = np.mean(np.concatenate((work_bout_1_val2,recovery_1_val2)))
+
+# Finding the average of the first work bout, the first recovery and second work bout
+avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
+avg_work_rec_work_val2 = np.mean(val_test_2.power[0:388])
+
+# Plotting the averages
+compare_power([val_test_1.power[0:602], 488*[avg_work_rec_val1], 602*[avg_work_rec_work_val1], 602*[cp]], legends=['power', f'average power {round(avg_work_rec_val1)}W', f'average power {round(avg_work_rec_work_val1)}W', f'CP: {cp}W'])
+compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_rec_work_val2], 388*[cp]], legends=['power', f'average power {round(avg_work_rec_val2)}W', f'average power {round(avg_work_rec_work_val2)}W', f'CP: {cp}W'])
+
 # Calculate w_bal with different algorithms
 val1_power = pd.DataFrame(dict(power=val_test_1.power), index=val_test_1.time)
 val2_power = pd.DataFrame(dict(power=val_test_2.power), index=val_test_2.time)
