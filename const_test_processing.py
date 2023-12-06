@@ -55,8 +55,13 @@ fitted_nl2 = nonlinear_2(power, awc_nl2, cp_nl2)
 fitted_nl3 = nonlinear_3(power, awc_nl3, cp_nl3, p_max_nl3)
 fitted_nl4 = nonlinear_4(power, awc_nl4, cp_nl4, p_max_nl4, tau_nl4)
 
+# Include time points from the first workbouts of the validation tests
+val_power_points = [359, 349]
+val_time_points = [248, 282]
+
 # Plot the fitted models 
-plot_regression(power_points, time_points, fitted_linear_tw, params_ltw, fitted_linear_p, params_lp, fitted_nl2, params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4)
+plot_regression(power_points, time_points, fitted_linear_tw, params_ltw, fitted_linear_p, params_lp, 
+                fitted_nl2, params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4, val_power_points, val_time_points)
 
 # Calculate R-squared
 r_squared_ltw = r_squared(power_points*time_points, time_points, fitted_linear_tw)

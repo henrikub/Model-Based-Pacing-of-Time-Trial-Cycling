@@ -12,7 +12,8 @@ def compare_power(power_data, time, legends, title=None):
     plt.title(title)
     plt.show()
 
-def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp, params_lp, fitted_nl2, params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4):
+def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp, params_lp, fitted_nl2, 
+                    params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4, val_power_points=None, val_time_points=None):
     time = np.arange(1,1200)
     power = np.arange(0,500)
     
@@ -25,6 +26,9 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.text(0.8, 0.5, text_lp, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(1/time_points[i], power_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+    if val_power_points != None:
+        for i in range(len(val_power_points)):
+            plt.plot(1/val_time_points[i], val_power_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
     plt.xlim(0, 0.007)
     plt.ylim(0, 550)
 
@@ -39,6 +43,9 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.text(0.8, 0.5, text_ltw, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(time_points[i], power_points[i]*time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+    if val_power_points != None:
+        for i in range(len(val_power_points)):
+            plt.plot(val_time_points[i], val_power_points[i]*val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
     plt.xlim(0,1200)
     plt.ylim(0,400000)
     plt.subplots_adjust(hspace=0.7)
@@ -53,6 +60,9 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.text(0.8, 0.5, text_nl2, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+    if val_power_points != None:
+        for i in range(len(val_power_points)):
+            plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
     plt.xlim(270,500)
     plt.ylim(0,1200)
 
@@ -65,6 +75,9 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.text(0.8, 0.5, text_nl3, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+    if val_power_points != None:
+        for i in range(len(val_power_points)):
+            plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
     plt.xlim(270,500)
     plt.ylim(0,1200)
     plt.subplots_adjust(hspace=0.7)
@@ -79,6 +92,9 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.text(0.8, 0.5, text_nl4, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
+    if val_power_points != None:
+        for i in range(len(val_power_points)):
+            plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
     plt.xlim(270,500)
     plt.ylim(0,1200)
 
