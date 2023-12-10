@@ -36,28 +36,28 @@ power_points = np.array([int(test1_activity.avg_power), int(test2_activity.avg_p
 time_points = np.array([int(test1_activity.total_time), int(test2_activity.total_time), int(test3_activity.total_time), int(test4_activity.total_time)])
 
 params_lp, covariance_lp = regression(linear_p, power_points, time_points)
-awc_lp, cp_lp = params_lp
+w_prime_lp, cp_lp = params_lp
 
 params_ltw, covariance_ltw = regression(linear_tw, power_points, time_points)
-awc_ltw, cp_ltw = params_ltw
+w_prime_ltw, cp_ltw = params_ltw
 
 params_nl2, covariance_nl2 = regression(nonlinear_2, power_points, time_points)
-awc_nl2, cp_nl2 = params_nl2
+w_prime_nl2, cp_nl2 = params_nl2
 
 params_nl3, covariance_nl3 = regression(nonlinear_3, power_points, time_points)
-awc_nl3, cp_nl3, p_max_nl3 = params_nl3
+w_prime_nl3, cp_nl3, p_max_nl3 = params_nl3
 
 params_nl4, covariance_nl4 = regression(nonlinear_4, power_points, time_points)
-awc_nl4, cp_nl4, p_max_nl4, tau_nl4 = params_nl4
+w_prime_nl4, cp_nl4, p_max_nl4, tau_nl4 = params_nl4
 
 # Create the fitted models
 time = np.arange(1,1200)
 power = np.arange(0,500)
-fitted_linear_p = linear_p(time, awc_lp, cp_lp)
-fitted_linear_tw = linear_tw(time, awc_ltw, cp_ltw)
-fitted_nl2 = nonlinear_2(power, awc_nl2, cp_nl2)
-fitted_nl3 = nonlinear_3(power, awc_nl3, cp_nl3, p_max_nl3)
-fitted_nl4 = nonlinear_4(power, awc_nl4, cp_nl4, p_max_nl4, tau_nl4)
+fitted_linear_p = linear_p(time, w_prime_lp, cp_lp)
+fitted_linear_tw = linear_tw(time, w_prime_ltw, cp_ltw)
+fitted_nl2 = nonlinear_2(power, w_prime_nl2, cp_nl2)
+fitted_nl3 = nonlinear_3(power, w_prime_nl3, cp_nl3, p_max_nl3)
+fitted_nl4 = nonlinear_4(power, w_prime_nl4, cp_nl4, p_max_nl4, tau_nl4)
 
 # Include time points from the first workbouts of the validation tests
 val_power_points = [359, 349]
@@ -82,14 +82,14 @@ print(f"R-squared for the Nonlinear-4 model is {round(r_squared_nl4,3)}\n")
 
 # Find mean and SD for CP and W'
 print(f"Mean and SD for CP is {round(np.mean([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]))}W and {round(np.std([cp_lp, cp_ltw, cp_nl2, cp_nl3, cp_nl4]), 2)}")
-print(f"Mean and SD for W' is {round(np.mean([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]))}W and {round(np.std([awc_lp, awc_ltw, awc_nl2, awc_nl3, awc_nl4]), 2)}")
+print(f"Mean and SD for W' is {round(np.mean([w_prime_lp, w_prime_ltw, w_prime_nl2, w_prime_nl3, w_prime_nl4]))}W and {round(np.std([w_prime_lp, w_prime_ltw, w_prime_nl2, w_prime_nl3, w_prime_nl4]), 2)}")
 
 # Plot the w'bal for the constant tests
-w_bal_test1 = w_prime_balance_ode(test1_activity.power, cp_nl3, awc_nl3)
-w_bal_test2 = w_prime_balance_ode(test2_activity.power, cp_nl3, awc_nl3)
-w_bal_test3 = w_prime_balance_ode(test3_activity.power, cp_nl3, awc_nl3)
-w_bal_test4 = w_prime_balance_ode(test4_activity.power, cp_nl3, awc_nl3)
-w_bal_retest = w_prime_balance_ode(retest_activity.power, cp_nl3, awc_nl3)
+w_bal_test1 = w_prime_balance_ode(test1_activity.power, cp_nl3, w_prime_nl3)
+w_bal_test2 = w_prime_balance_ode(test2_activity.power, cp_nl3, w_prime_nl3)
+w_bal_test3 = w_prime_balance_ode(test3_activity.power, cp_nl3, w_prime_nl3)
+w_bal_test4 = w_prime_balance_ode(test4_activity.power, cp_nl3, w_prime_nl3)
+w_bal_retest = w_prime_balance_ode(retest_activity.power, cp_nl3, w_prime_nl3)
 
 plt.title("W'bal constant power output tests")
 plt.plot(w_bal_test1)

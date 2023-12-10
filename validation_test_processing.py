@@ -1,7 +1,6 @@
 from activity_reader import ActivityReader
 import numpy as np
 from w_bal import *
-import sweat
 from plotting import *
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -9,6 +8,10 @@ import pandas as pd
 # Read the validation tests
 val_test_1 = ActivityReader("Validation_test_240s_rec.tcx")
 val_test_2 = ActivityReader("Validation_test_30s_rec.tcx")
+
+# Define CP and W'
+cp = 265
+w_prime = 26630
 
 # Remove unactive periods
 val_test_1.remove_unactive_period(900)
@@ -25,53 +28,49 @@ for i in range(10,len(val_test_2.power)):
         val_test_2.power[i] = val_test_2.power[i+1]
 
 # Split into segments
-work_bout_1_val1 = val_test_1.power[0:248]
-recovery_1_val1 = val_test_1.power[248:488]
-work_bout_2_val1 = val_test_1.power[488:602]
-recovery_2_val1 = val_test_1.power[602:846]
-work_bout_3_val1 = val_test_1.power[846:len(val_test_1.power)]
+val_test_1_dict = {
+    "work_bout_1": [val_test_1.power[0:248], val_test_1.cadence[0:248], val_test_1.heart_rate[0:248]],
+    "recovery_1": [val_test_1.power[248:488], val_test_1.cadence[248:488], val_test_1.heart_rate[248:488]],
+    "work_bout_2": [val_test_1.power[488:602], val_test_1.cadence[488:602], val_test_1.heart_rate[488:602]],
+    "recovery_2": [val_test_1.power[602:846], val_test_1.cadence[602:846], val_test_1.heart_rate[602:846]],
+    "work_bout_3": [val_test_1.power[846:len(val_test_1.power)], val_test_1.cadence[846:len(val_test_1.power)], val_test_1.heart_rate[846:len(val_test_1.power)]]
+}
+val_test_2_dict = {
+    "work_bout_1": [val_test_2.power[0:282], val_test_2.cadence[0:282], val_test_2.heart_rate[0:282]],
+    "recovery_1": [val_test_2.power[282:319], val_test_2.cadence[282:319], val_test_2.heart_rate[282:319]],
+    "work_bout_2": [val_test_2.power[319:388], val_test_2.cadence[319:388], val_test_2.heart_rate[319:388]],
+    "recovery_2": [val_test_2.power[388:423], val_test_2.cadence[388:423], val_test_2.heart_rate[388:423]],
+    "work_bout_3": [val_test_2.power[423:len(val_test_2.power)], val_test_2.cadence[423:len(val_test_2.power)], val_test_2.heart_rate[423:len(val_test_2.power)]]
+}
 
-work_bout_1_val2 = val_test_2.power[0:282]
-recovery_1_val2 = val_test_2.power[282:319]
-work_bout_2_val2 = val_test_2.power[319:388]
-recovery_2_val2 = val_test_2.power[388:423]
-work_bout_3_val2 = val_test_2.power[423:len(val_test_2.power)]
+for elem in [val_test_1_dict, val_test_2_dict]:
+    for key in elem:
+        print(f"{key}: Average power = {round(np.mean(elem[key][0]))}, time = {len(elem[key][0])}, average cadence = {round(np.mean(elem[key][1]))}, HR change = {elem[key][2][-1]-elem[key][2][0]}, \% W' exp = {round(np.sum([power-cp for power in elem[key][0]])/w_prime*100,1)}")
+    print('\n')
 
-# Define CP and AWC
-cp = 265
-awc = 26630
 
-# Print stats about the tests
-print("For the first test:")
-for i, elem in enumerate([recovery_1_val1, recovery_2_val1]):
-    print(f"Average power for recovery {i+1} was {np.average(elem)}\n")
+# work_bout_1_val1 = val_test_1.power[0:248]
+# recovery_1_val1 = val_test_1.power[248:488]
+# work_bout_2_val1 = val_test_1.power[488:602]
+# recovery_2_val1 = val_test_1.power[602:846]
+# work_bout_3_val1 = val_test_1.power[846:len(val_test_1.power)]
 
-w_prime_exp_val1 = []
-for i, elem in enumerate([work_bout_1_val1, work_bout_2_val1, work_bout_3_val1]):
-    w_prime_exp_val1.append(np.sum([power-cp for power in elem]))
-    print(f"Average power for work bout {i+1} is {np.average(elem)}W")
-    print(f"W' expended for work bout {i+1} is {w_prime_exp_val1[i]/1000}kJ\n")
-
-print("For the second test:")
-for i, elem in enumerate([recovery_1_val2, recovery_2_val2]):
-    print(f"Average power for recovery {i+1} was {np.average(elem)}\n")
-
-w_prime_exp_val2 = []
-for i, elem in enumerate([work_bout_1_val2, work_bout_2_val2, work_bout_3_val2]):
-    w_prime_exp_val2.append(np.sum([power-cp for power in elem]))
-    print(f"Average power for work bout {i+1} is {np.average(elem)}W")
-    print(f"W' expended for work bout {i+1} is {w_prime_exp_val2[i]/1000}kJ\n")
+# work_bout_1_val2 = val_test_2.power[0:282]
+# recovery_1_val2 = val_test_2.power[282:319]
+# work_bout_2_val2 = val_test_2.power[319:388]
+# recovery_2_val2 = val_test_2.power[388:423]
+# work_bout_3_val2 = val_test_2.power[423:len(val_test_2.power)]
 
 # Plot the power outputs
-avg_power_val1 = len(work_bout_1_val1)*[np.average(work_bout_1_val1)] + len(recovery_1_val1)*[np.average(recovery_1_val1)] + len(work_bout_2_val1)*[np.average(work_bout_2_val1)]+ len(recovery_2_val1)*[np.average(recovery_2_val1)]+ len(work_bout_3_val1)*[np.average(work_bout_3_val1)]
+avg_power_val1 = len(val_test_1_dict["work_bout_1"][0])*[np.average(val_test_1_dict["work_bout_1"][0])] + len(val_test_1_dict["recovery_1"][0])*[np.average(val_test_1_dict["recovery_1"][0])] + len(val_test_1_dict["work_bout_2"][0])*[np.average(val_test_1_dict["work_bout_2"][0])]+ len(val_test_1_dict["recovery_2"][0])*[np.average(val_test_1_dict["recovery_2"][0])]+ len(val_test_1_dict["work_bout_3"][0])*[np.average(val_test_1_dict["work_bout_3"][0])]
 compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], val_test_1.time, ['Power', 'Average power', 'CP'], 'Validation test 240s recovery')
 
-avg_power_val2 = len(work_bout_1_val2)*[np.average(work_bout_1_val2)] + len(recovery_1_val2)*[np.average(recovery_1_val2)] + len(work_bout_2_val2)*[np.average(work_bout_2_val2)]+ len(recovery_2_val2)*[np.average(recovery_2_val2)]+ len(work_bout_3_val2)*[np.average(work_bout_3_val2)]
+avg_power_val2 = len(val_test_2_dict["work_bout_1"][0])*[np.average(val_test_2_dict["work_bout_1"][0])] + len(val_test_2_dict["recovery_1"][0])*[np.average(val_test_2_dict["recovery_1"][0])] + len(val_test_2_dict["work_bout_2"][0])*[np.average(val_test_2_dict["work_bout_2"][0])]+ len(val_test_2_dict["recovery_2"][0])*[np.average(val_test_2_dict["recovery_2"][0])]+ len(val_test_2_dict["work_bout_3"][0])*[np.average(val_test_2_dict["work_bout_3"][0])]
 compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', 'CP'], 'Validation test 30s recovery')
 
 # Finding the average of the first work bout and recovery
-avg_work_rec_val1 = np.mean(np.concatenate((work_bout_1_val1,recovery_1_val1)))
-avg_work_rec_val2 = np.mean(np.concatenate((work_bout_1_val2,recovery_1_val2)))
+avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
+avg_work_rec_val2 = np.mean(np.concatenate((val_test_2_dict["work_bout_1"][0],val_test_2_dict["recovery_1"][0])))
 
 # Finding the average of the first work bout, the first recovery and second work bout
 avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
@@ -85,14 +84,14 @@ compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_r
 val1_power = pd.DataFrame(dict(power=val_test_1.power), index=val_test_1.time)
 val2_power = pd.DataFrame(dict(power=val_test_2.power), index=val_test_2.time)
 
-w_bal_dif_val1 = w_prime_balance_ode(val_test_1.power, cp, awc)
-w_bal_dif_val2 = w_prime_balance_ode(val_test_2.power, cp, awc)
-w_bal_int_val1 = w_prime_balance_integral(val1_power["power"], cp, awc)
-w_bal_int_val2 = w_prime_balance_integral(val2_power["power"], cp, awc)
-w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, awc)
-w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, awc)
-w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp(val1_power["power"], cp, awc)
-w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp(val2_power["power"], cp, awc)
+w_bal_dif_val1 = w_prime_balance_ode(val_test_1.power, cp, w_prime)
+w_bal_dif_val2 = w_prime_balance_ode(val_test_2.power, cp, w_prime)
+w_bal_int_val1 = w_prime_balance_integral(val1_power["power"], cp, w_prime)
+w_bal_int_val2 = w_prime_balance_integral(val2_power["power"], cp, w_prime)
+w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, w_prime)
+w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, w_prime)
+w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp(val1_power["power"], cp, w_prime)
+w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp(val2_power["power"], cp, w_prime)
 
 fig, ax1 = plt.subplots()
 plt.xlabel("Time [s]")
@@ -118,10 +117,10 @@ plt.show()
 
 # Plot predicted vs actual recovery
 # Actual:
-rec1_actual_val1 = w_prime_exp_val1[1]
-rec2_actual_val1 = w_prime_exp_val1[2]
-rec1_actual_val2 = w_prime_exp_val2[1]
-rec2_actual_val2 = w_prime_exp_val2[2]
+rec1_actual_val1 = np.sum([power-cp for power in val_test_1_dict["work_bout_2"][0]])
+rec2_actual_val1 = np.sum([power-cp for power in val_test_1_dict["work_bout_3"][0]])
+rec1_actual_val2 = np.sum([power-cp for power in val_test_2_dict["work_bout_2"][0]])
+rec2_actual_val2 = np.sum([power-cp for power in val_test_2_dict["work_bout_3"][0]])
 
 # Predicted by differential algorithm
 rec1_predicted_dif_val1 = w_bal_dif_val1[488]-w_bal_dif_val1[248]
@@ -163,11 +162,11 @@ predicted_biexp_recs = [rec1_predicted_biexp_val1, rec2_predicted_biexp_val1, re
 
 width = 0.1
 x = np.arange(4)
-plt.bar(x-0.2, np.array(actual_recs)/awc*100, width)
-plt.bar(x-0.1, np.array(predicted_dif_recs)/awc*100, width)
-plt.bar(x, np.array(predicted_int_recs)/awc*100, width)
-plt.bar(x+0.1, np.array(predicted_bart_recs)/awc*100, width)
-plt.bar(x+0.2, np.array(predicted_biexp_recs)/awc*100, width)
+plt.bar(x-0.2, np.array(actual_recs)/w_prime*100, width)
+plt.bar(x-0.1, np.array(predicted_dif_recs)/w_prime*100, width)
+plt.bar(x, np.array(predicted_int_recs)/w_prime*100, width)
+plt.bar(x+0.1, np.array(predicted_bart_recs)/w_prime*100, width)
+plt.bar(x+0.2, np.array(predicted_biexp_recs)/w_prime*100, width)
 plt.xticks(x, ['Recovery 1: 240s', 'Recovery 2: 240s', 'Recovery 1: 30s', 'Recovery 2: 30s'])
 plt.legend(['Actual', 'ODE', 'Integral', 'ODE with new tau', 'Bi-exp exponential'])
 plt.ylabel("W' reconstitution (%)")

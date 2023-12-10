@@ -26,7 +26,7 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Linear-P")
     plt.xlabel("1/time [1/s]")
     plt.ylabel("Power [W]")
-    text_lp = f'CP = {round(params_lp[1])}W\nAWC = {round(params_lp[0]/1000,2)}kJ'
+    text_lp = f'CP = {round(params_lp[1])}W\nW\' = {round(params_lp[0]/1000,2)}kJ'
     plt.text(0.8, 0.5, text_lp, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(1/time_points[i], power_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
@@ -43,7 +43,7 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Linear-TW")
     plt.xlabel("Time [s]")
     plt.ylabel("Total work [kJ]")
-    text_ltw = f'CP = {round(params_ltw[1])}W\nAWC = {round(params_ltw[0]/1000,2)}kJ'
+    text_ltw = f'CP = {round(params_ltw[1])}W\nW\' = {round(params_ltw[0]/1000,2)}kJ'
     plt.text(0.8, 0.5, text_ltw, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(time_points[i], power_points[i]*time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
@@ -60,7 +60,7 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Nonlinear-2")
     plt.xlabel("Power [W]")
     plt.ylabel("Time [s]")
-    text_nl2 = f'CP = {round(params_nl2[1])}W\nAWC = {round(params_nl2[0]/1000,2)}kJ'
+    text_nl2 = f'CP = {round(params_nl2[1])}W\nW\' = {round(params_nl2[0]/1000,2)}kJ'
     plt.text(0.8, 0.5, text_nl2, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
@@ -75,7 +75,7 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Nonlinear-3")
     plt.xlabel("Power [W]")
     plt.ylabel("Time [s]")
-    text_nl3 = f'CP = {round(params_nl3[1])}W\nAWC = {round(params_nl3[0]/1000,2)}kJ\nP_max = {round(params_nl3[2])}W'
+    text_nl3 = f'CP = {round(params_nl3[1])}W\nW\' = {round(params_nl3[0]/1000,2)}kJ\nP_max = {round(params_nl3[2])}W'
     plt.text(0.8, 0.5, text_nl3, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
@@ -92,7 +92,7 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Nonlinear-4")
     plt.xlabel("Power [W]")
     plt.ylabel("Time [s]")
-    text_nl4 = f'CP = {round(params_nl4[1])}W\nAWC = {round(params_nl4[0]/1000,2)}kJ\nP_max = {round(params_nl4[2])}W\ntau = {round(params_nl4[3], 4)}'
+    text_nl4 = f'CP = {round(params_nl4[1])}W\nW\' = {round(params_nl4[0]/1000,2)}kJ\nP_max = {round(params_nl4[2])}W\ntau = {round(params_nl4[3], 4)}'
     plt.text(0.8, 0.5, text_nl4, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
