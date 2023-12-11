@@ -138,8 +138,12 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=42, tau_dynamic
     w_prime_balance = []
     FC_balance = []
     SC_balance = []
+    tau_fc_dynamic = []
+    tau_sc_dynamic = []
     FC_amp = (w_prime * (0.75 * rec_parameter + 5.26))/100
     SC_amp = w_prime - FC_amp
+    # FC_amp = 36.8
+    # SC_amp = 63.2
     tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
     FC_bal = FC_amp
@@ -150,18 +154,70 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=42, tau_dynamic
     for t, p in enumerate(power):
         print(f"\nt = {t} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
         #for u, p in enumerate(power[: t + 1]):
-        if p > cp: 
-            new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
-            new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
-            new_w_bal = new_FC_bal + new_SC_bal
+        if p >= cp: 
+            # new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
+            # new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
+            # new_w_bal = new_FC_bal+new_SC_bal
+
+            new_FC_bal = FC_bal - (p-cp)/2
+            new_SC_bal = SC_bal - (p-cp)/2
+            new_w_bal = new_FC_bal+new_SC_bal
+
         else: 
             # new_FC_bal = (FC_amp - FC_bal) * (1 - math.e ** ((u-t)/tau_fc(t)))
             # new_SC_bal = (SC_amp - SC_bal) * (1 - math.e ** ((u-t)/tau_sc(t)))
             # new_w_bal = (FC_amp - FC_bal) * (1 - math.e ** ((u-t)/tau_fc(t))) + (SC_amp - SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
+            if last_w_bal == w_prime: 
+                new_w_bal = last_w_bal
+                new_FC_bal = FC_bal
+                new_SC_bal = SC_bal
+                pass 
             print(f"for t = {t} tau fc = {tau_fc(t)} and tau sc = {tau_sc(t)}")
-            new_FC_bal += (FC_amp-FC_bal) * (1- math.e ** (-t/tau_fc(t)))
-            new_SC_bal += (SC_amp-SC_bal) * (1 - math.e ** (-t/tau_sc(t)))
-            print(f"for t = {t}, recharge of FC bal = {new_FC_bal-FC_bal}, recharge of SC bal ={new_SC_bal-SC_bal}")
+            new_FC_bal += 100*(FC_amp-FC_bal)/w_prime * (1- math.e ** (-t/tau_fc(t)))
+            new_SC_bal += 100*(SC_amp-SC_bal)/w_prime * (1 - math.e ** (-t/tau_sc(t)))
+            print(f"recharge of FC bal = {new_FC_bal-FC_bal}, recharge of SC bal ={new_SC_bal-SC_bal}, FC gain = {FC_amp-FC_bal}, SC gain = {SC_amp-SC_bal}")
+            print(f"SC amp = {SC_amp} FC amp = {FC_amp} SC bal = {SC_bal} FC bal = {FC_bal}")
+            new_w_bal = new_FC_bal + new_SC_bal
+
+        w_prime_balance.append(new_w_bal)
+        FC_balance.append(new_FC_bal)
+        SC_balance.append(new_SC_bal)
+        tau_fc_dynamic.append(tau_fc(t))
+        tau_sc_dynamic.append(tau_sc(t))
+
+        last_w_bal = new_w_bal
+        FC_bal = new_FC_bal
+        SC_bal = new_SC_bal
+
+    return (pd.Series(w_prime_balance), FC_balance, SC_balance)
+
+def w_prime_bal_dynamic_bi_exp_percentage(power, cp, w_prime, rec_parameter=42, tau_dynamic=False, tau_value=None, *args, **kwargs):
+    last_w_bal = 100
+    w_prime_balance = []
+    FC_balance = []
+    SC_balance = []
+    FC_amp = 36.8
+    SC_amp = 63.2
+    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
+    FC_bal = FC_amp
+    SC_bal = SC_amp 
+    new_FC_bal = 0
+    new_SC_bal = 0
+
+    for t, p in enumerate(power):
+        print(f"\nt = {t} and FC_bal = {FC_bal} and SC_bal = {SC_bal} and last_w_bal = {last_w_bal}")
+        if p >= cp: 
+            new_FC_bal = FC_amp - ((p-cp) * t * FC_bal / last_w_bal)
+            new_SC_bal = SC_amp - ((p-cp) * t * SC_bal / last_w_bal)
+            new_w_bal = new_FC_bal + new_SC_bal
+
+        else: 
+            print(f"for t = {t} tau fc = {tau_fc(t)} and tau sc = {tau_sc(t)}")
+            new_FC_bal += (FC_amp-FC_bal)/10000 * (1- math.e ** (-t/tau_fc(t)))
+            new_SC_bal += (SC_amp-SC_bal)/10000 * (1 - math.e ** (-t/tau_sc(t)))
+            print(f"recharge of FC bal = {new_FC_bal-FC_bal}, recharge of SC bal ={new_SC_bal-SC_bal}, FC gain = {FC_amp-FC_bal}, SC gain = {SC_amp-SC_bal}")
+            print(f"SC amp = {SC_amp} FC amp = {FC_amp} SC bal = {SC_bal} FC bal = {FC_bal}")
             new_w_bal = new_FC_bal + new_SC_bal
 
         w_prime_balance.append(new_w_bal)
@@ -176,7 +232,7 @@ def w_prime_bal_dynamic_bi_exp(power, cp, w_prime, rec_parameter=42, tau_dynamic
 
 
 def w_prime_balance_bi_exp(
-    power, cp, w_prime, tau_dynamic=False, tau_value=None, *args, **kwargs
+    power, cp, w_prime, tau_dynamic=True, tau_value=None, *args, **kwargs
 ):
 
     w_prime_balance = []
@@ -195,9 +251,14 @@ def w_prime_balance_bi_exp(
         SC_exp_sum = 0
 
         for u, p in enumerate(power[: t + 1]):
-            w_prime_exp = max(0, p - cp)
-            FC_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc(t)))
-            SC_exp_sum += w_prime_exp * (SC * np.power(np.e, (u - t) / tau_sc(t)))
+            if p >= cp:
+                w_prime_exp_sum += p-cp
+                FC_exp_sum += (p-cp)/2
+                SC_exp_sum += (p-cp)/2
+            else:
+                w_prime_exp = max(0, p - cp)
+                FC_exp_sum += w_prime_exp * (FC * np.power(np.e, (u - t) / tau_fc(t)))
+                SC_exp_sum += w_prime_exp * (SC * np.power(np.e, (u - t) / tau_sc(t)))
         
         w_prime_exp_sum = FC_exp_sum + SC_exp_sum
         w_prime_balance.append(w_prime - w_prime_exp_sum)
@@ -207,38 +268,45 @@ def w_prime_balance_bi_exp(
     return w_prime_balance, FC_bal, SC_bal
 
 
-def w_prime_balance_bi_exp_2(
-    power, cp, w_prime, tau_dynamic=False, tau_value=None, *args, **kwargs
-):
-
+def w_prime_balance_bi_exp_2(power, cp, w_prime, tau_dynamic=False):
     w_prime_balance = []
-    FC_bal = []
-    SC_bal = []
+    FC_balance = []
+    SC_balance = []
+
     FC_amp = 0.3679*w_prime
     SC_amp = 0.6324*w_prime
-    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
-    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
-    FC = 3
-    SC = 1.5
+    last_FC_bal = FC_amp
+    last_SC_bal = SC_amp
+    new_FC_bal = 0
+    new_SC_bal = 0
 
-    for t in range(len(power)):
-        w_prime_exp_sum = 0
-        FC_exp_sum = 0
-        SC_exp_sum = 0
-        for u, p in enumerate(power[: t + 1]):
-            if p < cp:
-                FC_exp_sum += (p-cp) * (FC * np.power(np.e, (u - t) / tau_fc(t)))
-                SC_exp_sum += (p-cp) * (SC * np.power(np.e, (u - t) / tau_sc(t)))
-            else:
-                FC_exp_sum -= (cp-p)/2
-                SC_exp_sum -= (cp-p)/2
-            
-        w_prime_exp_sum = FC_exp_sum + SC_exp_sum
-        w_prime_balance.append(w_prime - w_prime_exp_sum)
-        FC_bal.append(FC_amp - FC_exp_sum)
-        SC_bal.append(SC_amp - SC_exp_sum)
+    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, None, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, None, fast_component=False)
+    
+    last_w_bal = w_prime
+    new_w_bal = 0
 
-    return w_prime_balance, FC_bal, SC_bal
+
+    for t, p in enumerate(power):
+        if p >= cp:
+            new_FC_bal = FC_amp - ((p-cp)*t*last_FC_bal/last_w_bal)
+            new_SC_bal = SC_amp - ((p-cp)*t*last_SC_bal/last_w_bal)
+            new_w_bal = w_prime - ((p-cp)*t*last_FC_bal + (p-cp)*t*last_SC_bal/last_w_bal)/last_w_bal
+
+        else:
+            new_FC_bal = (FC_amp-last_FC_bal)*(1-np.e**(-t/tau_fc(t)))
+            new_SC_bal = (SC_amp-last_SC_bal)*(1-np.e**(-t/tau_sc(t)))           
+            new_w_bal = (FC_amp-last_FC_bal)*(1-np.e**(-t/tau_fc(t))) + (SC_amp-last_SC_bal)*(1-np.e**(-t/tau_sc(t)))
+    
+        w_prime_balance.append(new_w_bal)
+        FC_balance.append(new_FC_bal)
+        SC_balance.append(new_SC_bal)
+    
+        last_w_bal = new_w_bal
+        last_FC_bal = new_FC_bal
+        last_SC_bal = new_SC_bal
+
+    return w_prime_balance, FC_balance, SC_balance
 
 
 def w_prime_balance_bi_exp_reg(power, FC, SC):

@@ -10,23 +10,35 @@ from scipy.optimize import curve_fit
 cp = 265
 w_prime = 26630
 
-act = ActivityReader("Validation_test_240s_rec.tcx")
+act = ActivityReader("Validation_test_30s_rec.tcx")
 act.remove_unactive_period(800)
 
-# test_power = 50*[300] + 50*[290] + 200*[320] + 100*[240]
-# test_time = np.arange(0,400,1)
+test_power = 50*[300] + 50*[290] + 200*[320] + 100*[250]
+test_time = np.arange(0,400,1)
 
-# data = pd.DataFrame(dict(power=test_power), index=test_time)
+data = pd.DataFrame(dict(power=act.power), index=act.time)
 
-# w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
+w_bal_bi_exp, FC_bal, SC_bal = w_prime_bal_dynamic_bi_exp(data["power"], cp, w_prime)
+w_bal_bi_exp_percentage, FC_bal_p, SC_bal_p = w_prime_bal_dynamic_bi_exp_percentage(data["power"], cp, w_prime)
+w_bal_ode = w_prime_balance_ode(data["power"], cp, w_prime)
+w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
 
-# plt.subplot(2,1,1)
+plt.subplot(2,1,1)
 # plt.plot(w_bal_bi_exp)
+# plt.plot(w_bal_ode)
+plt.plot(w_bal_bi_exp)
+# plt.legend(["Bi exp", "ODE", "Bi exp 2"])
 
-# plt.subplot(2,1,2)
-# plt.plot(FC_bal)
-# plt.plot(SC_bal)
-# plt.legend(['FC bal', 'SC bal'])
+plt.subplot(2,1,2)
+plt.plot(FC_bal)
+plt.plot(SC_bal)
+plt.legend(['FC bal', 'SC bal'])
+plt.show()
+
+# plt.subplot(3,1,3)
+# plt.plot(tau_fc_dynamic)
+# plt.plot(tau_sc_dynamic)
+# plt.legend(['tau fc', 'tau sc'])
 # plt.show()
 
 # power_profile = 240*[350] + 30*[225] + 120*[350] + 30*[225]+ 100*[350]
@@ -38,40 +50,6 @@ act.remove_unactive_period(800)
 # plt.ylim((0,400))
 # plt.show()
 
-
-def f(x_data, a, b, c):
-    cp = 265
-    w_prime = 26630
-    w_prime_balance = []
-    data = pd.DataFrame(dict(power=act.power), index=act.time)
-    power = data["power"]
-
-    for t in range(len(x_data)):
-        w_prime_exp_sum = 0
-
-        for u, p in enumerate(power[: t + 1]):
-            avg_power_below_cp = power[:t][power[:t] < cp].mean()
-            if math.isnan(avg_power_below_cp):
-                avg_power_below_cp = 0
-            delta_cp = cp - avg_power_below_cp
-            tau = a * math.e ** (b * delta_cp) + c
-            w_prime_exp = max(0, p - cp)
-            w_prime_exp_sum += w_prime_exp * np.power(np.e, (u - t) / tau)
-
-        w_prime_balance.append(w_prime - w_prime_exp_sum)
-
-    return w_prime_balance
-
-
-x_data = [0, 248, 488, 602, 846, 949]
-y_data = [cp, 1500, 11118, 1500, 10596, 1500]
-ppot, pcov = curve_fit(f, x_data, y_data, p0=(546, -0.01, 316), bounds=([1, -10, 1],[1000, -0.00001, 1000]))
-a, b, c = ppot
-print(a,b,c)
-
-w_prime_fitted_tau = f(x_data, a, b, c)
-plt.plot(x_data, w_prime_fitted_tau)
-plt.show()
 
 
 # w_bal_bi_exp, FC_balance, SC_balance = w_prime_bal_dynamic_bi_exp(data["power"], cp=cp, w_prime=w_prime, rec_parameter=42, tau_dynamic=True)

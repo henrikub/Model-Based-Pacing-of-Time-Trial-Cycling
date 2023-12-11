@@ -49,18 +49,6 @@ for elem in [val_test_1_dict, val_test_2_dict]:
     print('\n')
 
 
-# work_bout_1_val1 = val_test_1.power[0:248]
-# recovery_1_val1 = val_test_1.power[248:488]
-# work_bout_2_val1 = val_test_1.power[488:602]
-# recovery_2_val1 = val_test_1.power[602:846]
-# work_bout_3_val1 = val_test_1.power[846:len(val_test_1.power)]
-
-# work_bout_1_val2 = val_test_2.power[0:282]
-# recovery_1_val2 = val_test_2.power[282:319]
-# work_bout_2_val2 = val_test_2.power[319:388]
-# recovery_2_val2 = val_test_2.power[388:423]
-# work_bout_3_val2 = val_test_2.power[423:len(val_test_2.power)]
-
 # Plot the power outputs
 avg_power_val1 = len(val_test_1_dict["work_bout_1"][0])*[np.average(val_test_1_dict["work_bout_1"][0])] + len(val_test_1_dict["recovery_1"][0])*[np.average(val_test_1_dict["recovery_1"][0])] + len(val_test_1_dict["work_bout_2"][0])*[np.average(val_test_1_dict["work_bout_2"][0])]+ len(val_test_1_dict["recovery_2"][0])*[np.average(val_test_1_dict["recovery_2"][0])]+ len(val_test_1_dict["work_bout_3"][0])*[np.average(val_test_1_dict["work_bout_3"][0])]
 compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], val_test_1.time, ['Power', 'Average power', 'CP'], 'Validation test 240s recovery')
@@ -90,8 +78,8 @@ w_bal_int_val1 = w_prime_balance_integral(val1_power["power"], cp, w_prime)
 w_bal_int_val2 = w_prime_balance_integral(val2_power["power"], cp, w_prime)
 w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, w_prime)
 w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, w_prime)
-w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp(val1_power["power"], cp, w_prime)
-w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp(val2_power["power"], cp, w_prime)
+w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_bal_dynamic_bi_exp(val1_power["power"], cp, w_prime)
+w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_bal_dynamic_bi_exp(val2_power["power"], cp, w_prime)
 
 fig, ax1 = plt.subplots()
 plt.xlabel("Time [s]")
