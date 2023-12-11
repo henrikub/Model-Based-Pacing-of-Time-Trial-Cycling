@@ -26,8 +26,8 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Linear-P")
     plt.xlabel("1/time [1/s]")
     plt.ylabel("Power [W]")
-    text_lp = f'CP = {round(params_lp[1])}W\nW\' = {round(params_lp[0]/1000,2)}kJ'
-    plt.text(0.8, 0.5, text_lp, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
+    # text_lp = f'CP = {round(params_lp[1])}W\nW\' = {round(params_lp[0]/1000,2)}kJ'
+    # plt.text(0.8, 0.5, text_lp, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(1/time_points[i], power_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
     if val_power_points != None:
@@ -43,8 +43,8 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.title("Linear-TW")
     plt.xlabel("Time [s]")
     plt.ylabel("Total work [kJ]")
-    text_ltw = f'CP = {round(params_ltw[1])}W\nW\' = {round(params_ltw[0]/1000,2)}kJ'
-    plt.text(0.8, 0.5, text_ltw, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
+    # text_ltw = f'CP = {round(params_ltw[1])}W\nW\' = {round(params_ltw[0]/1000,2)}kJ'
+    # plt.text(0.8, 0.5, text_ltw, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(time_points[i], power_points[i]*time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
     if val_power_points != None:
@@ -54,53 +54,20 @@ def plot_regression(power_points, time_points, fitted_ltw, params_ltw, fitted_lp
     plt.ylim(0,400000)
     plt.subplots_adjust(hspace=0.7)
     plt.show()
-
-    plt.subplot(2,1,1)
+    
     plt.plot(power, fitted_nl2)
-    plt.title("Nonlinear-2")
-    plt.xlabel("Power [W]")
-    plt.ylabel("Time [s]")
-    text_nl2 = f'CP = {round(params_nl2[1])}W\nW\' = {round(params_nl2[0]/1000,2)}kJ'
-    plt.text(0.8, 0.5, text_nl2, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
-    for i in range(len(power_points)):
-        plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
-    if val_power_points != None:
-        for i in range(len(val_power_points)):
-            plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
-    plt.xlim(270,500)
-    plt.ylim(0,1200)
-
-    plt.subplot(2,1,2)
     plt.plot(power, fitted_nl3)
-    plt.title("Nonlinear-3")
-    plt.xlabel("Power [W]")
-    plt.ylabel("Time [s]")
-    text_nl3 = f'CP = {round(params_nl3[1])}W\nW\' = {round(params_nl3[0]/1000,2)}kJ\nP_max = {round(params_nl3[2])}W'
-    plt.text(0.8, 0.5, text_nl3, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
-    for i in range(len(power_points)):
-        plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
-    if val_power_points != None:
-        for i in range(len(val_power_points)):
-            plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
-    plt.xlim(270,500)
-    plt.ylim(0,1200)
-    plt.subplots_adjust(hspace=0.7)
-    plt.show()
-
-    plt.subplot(2,1,1)
     plt.plot(power, fitted_nl4)
-    plt.title("Nonlinear-4")
     plt.xlabel("Power [W]")
     plt.ylabel("Time [s]")
-    text_nl4 = f'CP = {round(params_nl4[1])}W\nW\' = {round(params_nl4[0]/1000,2)}kJ\nP_max = {round(params_nl4[2])}W\ntau = {round(params_nl4[3], 4)}'
-    plt.text(0.8, 0.5, text_nl4, ha='center', va='center', transform=plt.gca().transAxes, fontsize='large')
     for i in range(len(power_points)):
         plt.plot(power_points[i], time_points[i], marker="o", markersize=10, markeredgecolor="red", markerfacecolor="red")
     if val_power_points != None:
         for i in range(len(val_power_points)):
             plt.plot(val_power_points[i], val_time_points[i], marker="o", markersize=10, markeredgecolor="blue", markerfacecolor="blue")
+    #plt.legend([f"Nonlinear-2: CP = {round(params_nl2[1])}W, W\' = {round(params_nl2[0]/1000,2)}kJ", f"Nonlinear-3: CP = {round(params_nl3[1])}W, W\' = {round(params_nl3[0]/1000,2)}kJ, P_max = {round(params_nl3[2])}W", f"Nonlinear-4: CP = {round(params_nl4[1])}W, W\' = {round(params_nl4[0]/1000,2)}kJ, P_max = {round(params_nl4[2])}W, tau = {round(params_nl4[3], 4)}"])
+    plt.legend(["Nonlinear-2", "Nonlinear-3", "Nonlinear-4"])
+    plt.title("The Nonlinear Models")
     plt.xlim(270,500)
     plt.ylim(0,1200)
-
-    plt.subplots_adjust(hspace=0.7)
     plt.show()
