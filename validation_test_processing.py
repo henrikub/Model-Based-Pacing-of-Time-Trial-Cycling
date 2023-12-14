@@ -51,10 +51,10 @@ for elem in [val_test_1_dict, val_test_2_dict]:
 
 # Plot the power outputs
 avg_power_val1 = len(val_test_1_dict["work_bout_1"][0])*[np.average(val_test_1_dict["work_bout_1"][0])] + len(val_test_1_dict["recovery_1"][0])*[np.average(val_test_1_dict["recovery_1"][0])] + len(val_test_1_dict["work_bout_2"][0])*[np.average(val_test_1_dict["work_bout_2"][0])]+ len(val_test_1_dict["recovery_2"][0])*[np.average(val_test_1_dict["recovery_2"][0])]+ len(val_test_1_dict["work_bout_3"][0])*[np.average(val_test_1_dict["work_bout_3"][0])]
-compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], val_test_1.time, ['Power', 'Average power', 'CP'], 'Validation test 240s recovery')
+compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], val_test_1.time, ['Power', 'Average power', f'CP: {cp}W'], 'Validation test 240s recovery')
 
 avg_power_val2 = len(val_test_2_dict["work_bout_1"][0])*[np.average(val_test_2_dict["work_bout_1"][0])] + len(val_test_2_dict["recovery_1"][0])*[np.average(val_test_2_dict["recovery_1"][0])] + len(val_test_2_dict["work_bout_2"][0])*[np.average(val_test_2_dict["work_bout_2"][0])]+ len(val_test_2_dict["recovery_2"][0])*[np.average(val_test_2_dict["recovery_2"][0])]+ len(val_test_2_dict["work_bout_3"][0])*[np.average(val_test_2_dict["work_bout_3"][0])]
-compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', 'CP'], 'Validation test 30s recovery')
+compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', f'CP: {cp}W'], 'Validation test 30s recovery')
 
 # Finding the average of the first work bout and recovery
 avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
@@ -78,8 +78,8 @@ w_bal_int_val1 = w_prime_balance_integral(val1_power["power"], cp, w_prime)
 w_bal_int_val2 = w_prime_balance_integral(val2_power["power"], cp, w_prime)
 w_bal_bart_val1 = w_prime_balance_bart(val1_power["power"], cp, w_prime)
 w_bal_bart_val2 = w_prime_balance_bart(val2_power["power"], cp, w_prime)
-w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_bal_dynamic_bi_exp(val1_power["power"], cp, w_prime)
-w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_bal_dynamic_bi_exp(val2_power["power"], cp, w_prime)
+w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp(val1_power["power"], cp, w_prime)
+w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp(val2_power["power"], cp, w_prime)
 
 fig, ax1 = plt.subplots()
 plt.xlabel("Time [s]")

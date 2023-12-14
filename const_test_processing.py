@@ -63,9 +63,12 @@ fitted_nl4 = nonlinear_4(power, w_prime_nl4, cp_nl4, p_max_nl4, tau_nl4)
 val_power_points = [359, 349]
 val_time_points = [248, 282]
 
+retest_power = round(np.average(retest_activity.power))
+retest_time = retest_activity.time[-1]
+
 # Plot the fitted models 
 plot_regression(power_points, time_points, fitted_linear_tw, params_ltw, fitted_linear_p, params_lp, 
-                fitted_nl2, params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4, val_power_points, val_time_points)
+                fitted_nl2, params_nl2, fitted_nl3, params_nl3, fitted_nl4, params_nl4, val_power_points, val_time_points, retest_power, retest_time)
 
 # Calculate R-squared
 r_squared_ltw = r_squared(power_points*time_points, time_points, fitted_linear_tw)
