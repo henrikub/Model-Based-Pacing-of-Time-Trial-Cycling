@@ -19,29 +19,23 @@ test_time = np.arange(0,400)
 data = pd.DataFrame(dict(power=act.power), index=act.time)
 
 # w_bal_bi_exp, FC_bal, SC_bal = w_prime_bal_dynamic_bi_exp(data["power"], cp, w_prime)
-# w_bal_bi_exp_percentage, FC_bal_p, SC_bal_p = w_prime_bal_dynamic_bi_exp_percentage(data["power"], cp, w_prime)
 
-# w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
-
+w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
 w_bal_ode = w_prime_balance_ode(data["power"], cp, w_prime)
-w_bal_bart = w_prime_balance_bart(data["power"], cp, w_prime)
+w_bal_bart = w_prime_balance_bartram(data["power"], cp, w_prime)
+w_bal_int = w_prime_balance_integral(data["power"], cp, w_prime, tau_dynamic=True)
 
-plt.plot(w_bal_ode)
-plt.plot(w_bal_bart)
-plt.legend(["ODE", "Bartram"])
+
+plt.subplot(2,1,1)
+plt.plot(w_bal_bi_exp)
+plt.plot(w_bal_int)
+plt.legend(["Bi exp", "int"])
+
+plt.subplot(2,1,2)
+plt.plot(FC_bal)
+plt.plot(SC_bal)
+plt.legend(['FC bal', 'SC bal'])
 plt.show()
-
-# plt.subplot(2,1,1)
-# # plt.plot(w_bal_bi_exp)
-# # plt.plot(w_bal_ode)
-# plt.plot(w_bal_bi_exp)
-# # plt.legend(["Bi exp", "ODE", "Bi exp 2"])
-
-# plt.subplot(2,1,2)
-# plt.plot(FC_bal)
-# plt.plot(SC_bal)
-# plt.legend(['FC bal', 'SC bal'])
-# plt.show()
 
 # plt.subplot(3,1,3)
 # plt.plot(tau_fc_dynamic)
