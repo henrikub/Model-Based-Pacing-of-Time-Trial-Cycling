@@ -45,7 +45,7 @@ val_test_2_dict = {
 
 for elem in [val_test_1_dict, val_test_2_dict]:
     for key in elem:
-        print(f"{key}: Average power = {round(np.mean(elem[key][0]))}, time = {len(elem[key][0])}, average cadence = {round(np.mean(elem[key][1]))}, HR change = {elem[key][2][-1]-elem[key][2][0]}, \% W' exp = {round(np.sum([power-cp for power in elem[key][0]]),1)}")
+        print(f"{key}: Average power = {round(np.mean(elem[key][0]))}, time = {len(elem[key][0])}, average cadence = {round(np.mean(elem[key][1]))}, HR change = {elem[key][2][-1]-elem[key][2][0]}, W' exp = {round(np.sum([power-cp for power in elem[key][0]]),1)}J")
     print('\n')
 
 
@@ -56,17 +56,17 @@ compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], va
 avg_power_val2 = len(val_test_2_dict["work_bout_1"][0])*[np.average(val_test_2_dict["work_bout_1"][0])] + len(val_test_2_dict["recovery_1"][0])*[np.average(val_test_2_dict["recovery_1"][0])] + len(val_test_2_dict["work_bout_2"][0])*[np.average(val_test_2_dict["work_bout_2"][0])]+ len(val_test_2_dict["recovery_2"][0])*[np.average(val_test_2_dict["recovery_2"][0])]+ len(val_test_2_dict["work_bout_3"][0])*[np.average(val_test_2_dict["work_bout_3"][0])]
 compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', f'CP: {cp}W'], 'Validation test 30s recovery')
 
-# Finding the average of the first work bout and recovery
-avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
-avg_work_rec_val2 = np.mean(np.concatenate((val_test_2_dict["work_bout_1"][0],val_test_2_dict["recovery_1"][0])))
+# # Finding the average of the first work bout and recovery
+# avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
+# avg_work_rec_val2 = np.mean(np.concatenate((val_test_2_dict["work_bout_1"][0],val_test_2_dict["recovery_1"][0])))
 
-# Finding the average of the first work bout, the first recovery and second work bout
-avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
-avg_work_rec_work_val2 = np.mean(val_test_2.power[0:388])
+# # Finding the average of the first work bout, the first recovery and second work bout
+# avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
+# avg_work_rec_work_val2 = np.mean(val_test_2.power[0:388])
 
-# Plotting the averages
-compare_power([val_test_1.power[0:602], 488*[avg_work_rec_val1], 602*[avg_work_rec_work_val1], 602*[cp]], legends=['power', f'average power {round(avg_work_rec_val1)}W', f'average power {round(avg_work_rec_work_val1)}W', f'CP: {cp}W'])
-compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_rec_work_val2], 388*[cp]], legends=['power', f'average power {round(avg_work_rec_val2)}W', f'average power {round(avg_work_rec_work_val2)}W', f'CP: {cp}W'])
+# # Plotting the averages
+# compare_power([val_test_1.power[0:602], 488*[avg_work_rec_val1], 602*[avg_work_rec_work_val1], 602*[cp]], legends=['power', f'average power {round(avg_work_rec_val1)}W', f'average power {round(avg_work_rec_work_val1)}W', f'CP: {cp}W'])
+# compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_rec_work_val2], 388*[cp]], legends=['power', f'average power {round(avg_work_rec_val2)}W', f'average power {round(avg_work_rec_work_val2)}W', f'CP: {cp}W'])
 
 # Calculate w_bal with different algorithms
 val1_power = pd.DataFrame(dict(power=val_test_1.power), index=val_test_1.time)
@@ -81,10 +81,10 @@ w_bal_bartram_val1 = w_prime_balance_bartram(val1_power["power"], cp, w_prime)
 w_bal_bartram_val2 = w_prime_balance_bartram(val2_power["power"], cp, w_prime)
 
 # Models with fitted parameters
-w_bal_int_reg_val1 = w_bal_integral_regression(val1_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
-w_bal_int_reg_val2 = w_bal_integral_regression(val2_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
-w_bal_ode_reg_val1 = w_bal_ode_regression(val1_power["power"], cp, w_prime, d=765373, e=-1.847)
-w_bal_ode_reg_val2 = w_bal_ode_regression(val2_power["power"], cp, w_prime, d=765373, e=-1.847)
+w_bal_int_reg_val1 = w_prime_balance_integral_regression(val1_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
+w_bal_int_reg_val2 = w_prime_balance_integral_regression(val2_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
+w_bal_ode_reg_val1 = w_prime_balance_ode_regression(val1_power["power"], cp, w_prime, d=765373, e=-1.847)
+w_bal_ode_reg_val2 = w_prime_balance_ode_regression(val2_power["power"], cp, w_prime, d=765373, e=-1.847)
 w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp_regression(val1_power["power"], cp, w_prime, fc=4.4 , sc=1.1)
 w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp_regression(val2_power["power"], cp, w_prime, fc=4.4 , sc=1.1)
 

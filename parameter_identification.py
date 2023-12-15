@@ -26,12 +26,12 @@ for i in range(10,len(val2.power)):
 def regression_mono_exp(power, a, b, c):
     cp = 265
     w_prime = 26630
-    return w_bal_integral_regression(power, cp, w_prime, a, b, c)
+    return w_prime_balance_integral_regression(power, cp, w_prime, a, b, c)
 
 def regression_ode(power, d, e):
     cp = 265
     w_prime = 26630
-    return w_bal_ode_regression(power, cp, w_prime, d, e)
+    return w_prime_balance_ode_regression(power, cp, w_prime, d, e)
 
 def regression_bi_exp(power, fc, sc):
     cp = 265
