@@ -255,3 +255,72 @@ def w_prime_balance_bi_exp_2(power, cp, w_prime, tau_dynamic=False):
         SC_bal.append(SC_amp - SC_exp_sum)
 
     return w_prime_balance, FC_bal, SC_bal
+
+
+def w_prime_balance_bi_exp_regression(power, cp, w_prime, fc, sc):
+
+    w_prime_balance = []
+    FC_balance = []
+    SC_balance = []
+    FC_amp = 0.3679*w_prime
+    SC_amp = 0.6324*w_prime
+    tau_fc = get_bi_exp_tau_method(power, cp, True, None, fast_component=True)
+    tau_sc = get_bi_exp_tau_method(power, cp, True, None, fast_component=False)
+
+    for t in range(len(power)):
+        w_prime_exp_sum = 0
+        FC_exp_sum = 0
+        SC_exp_sum = 0
+
+        for u, p in enumerate(power[: t + 1]):
+            w_prime_exp = max(0, p - cp)
+            FC_exp_sum += w_prime_exp * (fc * np.power(np.e, (u - t) / tau_fc(t)))
+            SC_exp_sum += w_prime_exp * (sc * np.power(np.e, (u - t) / tau_sc(t)))
+        
+        w_prime_exp_sum = FC_exp_sum + SC_exp_sum
+        w_prime_balance.append(w_prime - w_prime_exp_sum)
+        FC_balance.append(FC_amp-FC_exp_sum)
+        SC_balance.append(SC_amp-SC_exp_sum)
+
+    return w_prime_balance, FC_balance, SC_balance
+
+def tau_regression(power, cp, a, b, c, untill=None):
+    if untill is None:
+        untill = len(power)
+
+    avg_power_below_cp = power[:untill][power[:untill] < cp].mean()
+    if math.isnan(avg_power_below_cp):
+        avg_power_below_cp = 0
+    delta_cp = cp - avg_power_below_cp
+
+    return a * math.e ** (b * delta_cp) + c
+
+def w_bal_integral_regression(power, cp, w_prime, a, b, c):
+    w_prime_balance = []
+    tau_dyn = [tau_regression(power, cp, a, b, c) for i in range(len(power))]
+    tau = lambda t: tau_dyn[t]
+
+    for t in range(len(power)):
+        w_prime_exp_sum = 0
+
+        for u, p in enumerate(power[: t + 1]):
+            w_prime_exp = max(0, p - cp)
+            w_prime_exp_sum += w_prime_exp * np.power(np.e, (u - t) / tau(t))
+
+        w_prime_balance.append(w_prime - w_prime_exp_sum)
+
+    return w_prime_balance
+
+def w_bal_ode_regression(power, cp, w_prime, d, e):
+    last = w_prime
+    w_prime_balance = []
+
+    for p in power:
+        if p < cp:
+            new = w_prime - (w_prime - last) * np.power(np.e, -1/(d*(cp-p)**e))
+        else:
+            new = last - (p - cp)
+
+        w_prime_balance.append(new)
+        last = new
+    return w_prime_balance

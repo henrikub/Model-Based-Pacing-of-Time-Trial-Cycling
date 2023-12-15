@@ -2,7 +2,6 @@ from activity_reader import ActivityReader
 import numpy as np
 from w_bal import *
 from plotting import *
-from parameter_identification import w_bal_integral_regression, w_bal_ode_regression, w_prime_balance_bi_exp_regression
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -84,10 +83,10 @@ w_bal_bartram_val2 = w_prime_balance_bartram(val2_power["power"], cp, w_prime)
 # Models with fitted parameters
 w_bal_int_reg_val1 = w_bal_integral_regression(val1_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
 w_bal_int_reg_val2 = w_bal_integral_regression(val2_power["power"], cp, w_prime, a=1362, b=-0.033, c=451)
-w_bal_ode_reg_val1 = w_bal_ode_regression(val1_power["power"], cp, w_prime, a=765373, b=-1.847)
-w_bal_ode_reg_val2 = w_bal_ode_regression(val2_power["power"], cp, w_prime, a=765373, b=-1.847)
-w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp_regression(val1_power["power"], cp, w_prime, fc=4.4 , sc=1.1, tau_dynamic=True)
-w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp_regression(val2_power["power"], cp, w_prime, fc=4.4 , sc=1.1, tau_dynamic=True)
+w_bal_ode_reg_val1 = w_bal_ode_regression(val1_power["power"], cp, w_prime, d=765373, e=-1.847)
+w_bal_ode_reg_val2 = w_bal_ode_regression(val2_power["power"], cp, w_prime, d=765373, e=-1.847)
+w_bal_biexp_val1, FC_bal_val1, SC_bal_val1 = w_prime_balance_bi_exp_regression(val1_power["power"], cp, w_prime, fc=4.4 , sc=1.1)
+w_bal_biexp_val2, FC_bal_val2, SC_bal_val2 = w_prime_balance_bi_exp_regression(val2_power["power"], cp, w_prime, fc=4.4 , sc=1.1)
 
 # Plot W'balance for the established models
 plt.subplot(2,1,1)
