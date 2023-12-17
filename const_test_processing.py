@@ -103,6 +103,6 @@ plt.plot(w_bal_retest)
 plt.legend([f'298W: {round(w_bal_test1[-1])}J remaining', f'345W: {round(w_bal_test2[-1])}J remaining', 
             f'392W: {round(w_bal_test3[-1])}J remaining', f'289W: {round(w_bal_test4[-1])}J remaining', 
             f'299W(retest): {round(w_bal_retest[-1])}J remaining'], loc='upper right')
-plt.ylabel("W'balance [J]")
+plt.ylabel("W'bal [J]")
 plt.xlabel("Time [s]")
 plt.show()

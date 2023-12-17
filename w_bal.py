@@ -128,8 +128,8 @@ def w_prime_balance_bi_exp(power, cp, w_prime, tau_dynamic=False, tau_value=None
     w_prime_balance = []
     FC_bal = []
     SC_bal = []
-    FC_amp = 0.3679*w_prime
-    SC_amp = 0.6324*w_prime
+    FC_amp = 0.365*w_prime
+    SC_amp = 0.635*w_prime
     tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
     fc = 4.4
@@ -159,8 +159,8 @@ def w_prime_balance_bi_exp_regression(power, cp, w_prime, fc, sc):
     w_prime_balance = []
     FC_balance = []
     SC_balance = []
-    FC_amp = 0.3679*w_prime
-    SC_amp = 0.6324*w_prime
+    FC_amp = 0.365*w_prime
+    SC_amp = 0.635*w_prime
     tau_fc = get_bi_exp_tau_method(power, cp, True, None, fast_component=True)
     tau_sc = get_bi_exp_tau_method(power, cp, True, None, fast_component=False)
 

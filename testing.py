@@ -13,10 +13,10 @@ w_prime = 26630
 act = ActivityReader("Validation_test_240s_rec.tcx")
 act.remove_unactive_period(900)
 
-test_power = 50*[300] + 50*[290] + 200*[320] + 100*[250]
-test_time = np.arange(0,400)
+test_power = 100*[400] + 100*[290] + 100*[280] + 100*[250] + 100*[240]
+test_time = np.arange(0,500)
 
-data = pd.DataFrame(dict(power=act.power), index=act.time)
+data = pd.DataFrame(dict(power=test_power), index=test_time)
 
 # w_bal_bi_exp, FC_bal, SC_bal = w_prime_bal_dynamic_bi_exp(data["power"], cp, w_prime)
 
@@ -28,8 +28,8 @@ w_bal_int = w_prime_balance_integral(data["power"], cp, w_prime, tau_dynamic=Tru
 
 plt.subplot(2,1,1)
 plt.plot(w_bal_bi_exp)
-plt.plot(w_bal_int)
-plt.legend(["Bi exp", "int"])
+plt.plot(w_bal_ode)
+plt.legend(["Bi exp", "ode"])
 
 plt.subplot(2,1,2)
 plt.plot(FC_bal)

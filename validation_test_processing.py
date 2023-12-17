@@ -56,17 +56,17 @@ compare_power([val_test_1.power, avg_power_val1, len(val_test_1.power)*[cp]], va
 avg_power_val2 = len(val_test_2_dict["work_bout_1"][0])*[np.average(val_test_2_dict["work_bout_1"][0])] + len(val_test_2_dict["recovery_1"][0])*[np.average(val_test_2_dict["recovery_1"][0])] + len(val_test_2_dict["work_bout_2"][0])*[np.average(val_test_2_dict["work_bout_2"][0])]+ len(val_test_2_dict["recovery_2"][0])*[np.average(val_test_2_dict["recovery_2"][0])]+ len(val_test_2_dict["work_bout_3"][0])*[np.average(val_test_2_dict["work_bout_3"][0])]
 compare_power([val_test_2.power, avg_power_val2, len(val_test_2.power)*[cp]], val_test_2.time, ['Power', 'Average power', f'CP: {cp}W'], 'Validation test 30s recovery')
 
-# # Finding the average of the first work bout and recovery
-# avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
-# avg_work_rec_val2 = np.mean(np.concatenate((val_test_2_dict["work_bout_1"][0],val_test_2_dict["recovery_1"][0])))
+# Finding the average of the first work bout and recovery
+avg_work_rec_val1 = np.mean(np.concatenate((val_test_1_dict["work_bout_1"][0],val_test_1_dict["recovery_1"][0])))
+avg_work_rec_val2 = np.mean(np.concatenate((val_test_2_dict["work_bout_1"][0],val_test_2_dict["recovery_1"][0])))
 
-# # Finding the average of the first work bout, the first recovery and second work bout
-# avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
-# avg_work_rec_work_val2 = np.mean(val_test_2.power[0:388])
+# Finding the average of the first work bout, the first recovery and second work bout
+avg_work_rec_work_val1 = np.mean(val_test_1.power[0:602])
+avg_work_rec_work_val2 = np.mean(val_test_2.power[0:388])
 
-# # Plotting the averages
-# compare_power([val_test_1.power[0:602], 488*[avg_work_rec_val1], 602*[avg_work_rec_work_val1], 602*[cp]], legends=['power', f'average power {round(avg_work_rec_val1)}W', f'average power {round(avg_work_rec_work_val1)}W', f'CP: {cp}W'])
-# compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_rec_work_val2], 388*[cp]], legends=['power', f'average power {round(avg_work_rec_val2)}W', f'average power {round(avg_work_rec_work_val2)}W', f'CP: {cp}W'])
+# Plotting the averages
+compare_power([val_test_1.power[0:602], 488*[avg_work_rec_val1], 602*[avg_work_rec_work_val1], 602*[cp]], legends=['power', f'average power {round(avg_work_rec_val1)}W', f'average power {round(avg_work_rec_work_val1)}W', f'CP: {cp}W'])
+compare_power([val_test_2.power[0:388], 319*[avg_work_rec_val2], 388*[avg_work_rec_work_val2], 388*[cp]], legends=['power', f'average power {round(avg_work_rec_val2)}W', f'average power {round(avg_work_rec_work_val2)}W', f'CP: {cp}W'])
 
 # Calculate w_bal with different algorithms
 val1_power = pd.DataFrame(dict(power=val_test_1.power), index=val_test_1.time)
@@ -141,28 +141,36 @@ plt.show()
 plt.subplot(2,1,1)
 plt.title("Validation test with 240s recovery")
 plt.plot(w_bal_biexp_val1)
+plt.ylim(-7000,30000)
+plt.ylabel("W' bal [J]")
+plt.xlabel("Time [s]")
 plt.legend(['Bi-exp model'])
-plt.subplots_adjust(hspace=0.7)
+
 plt.subplot(2,1,2)
 plt.plot(FC_bal_val1)
 plt.plot(SC_bal_val1)
-plt.legend(['FC bal', 'SC bal'])
+plt.legend(['FC balance', 'SC balance'])
 plt.ylabel("W' bal [J]")
 plt.xlabel("Time [s]")
+plt.ylim(-7000,20000)
 plt.subplots_adjust(hspace=0.7)
 plt.show()
 
 plt.subplot(2,1,1)
 plt.title("Validation test with 30s recovery")
 plt.plot(w_bal_biexp_val2)
+plt.ylim(-7000,30000)
+plt.ylabel("W' bal [J]")
+plt.xlabel("Time [s]")
 plt.legend(['Bi-exp model'])
-plt.subplots_adjust(hspace=0.7)
+
 plt.subplot(2,1,2)
 plt.plot(FC_bal_val2)
 plt.plot(SC_bal_val2)
-plt.legend(['FC bal', 'SC bal'])
+plt.legend(['FC balance', 'SC balance'])
 plt.ylabel("W' bal [J]")
 plt.xlabel("Time [s]")
+plt.ylim(-7000,20000)
 plt.subplots_adjust(hspace=0.7)
 plt.show()
 
@@ -180,7 +188,21 @@ rec2_predicted_ode_val1 = w_bal_ode_val1[846]-w_bal_ode_val1[602]
 rec1_predicted_ode_val2 = w_bal_ode_val2[319]-w_bal_ode_val2[282]
 rec2_predicted_ode_val2 = w_bal_ode_val2[423]-w_bal_ode_val2[388]
 
+# Predicted by ODE algorithm with fittted tau
+rec1_predicted_ode_reg_val1 = w_bal_ode_reg_val1[488]-w_bal_ode_reg_val1[248]
+rec2_predicted_ode_reg_val1 = w_bal_ode_reg_val1[846]-w_bal_ode_reg_val1[602]
+
+rec1_predicted_ode_reg_val2 = w_bal_ode_reg_val2[319]-w_bal_ode_reg_val2[282]
+rec2_predicted_ode_reg_val2 = w_bal_ode_reg_val2[423]-w_bal_ode_reg_val2[388]
+
 # Predicted by integral algorithm
+rec1_predicted_int_reg_val1 = w_bal_int_reg_val1[488]-w_bal_int_reg_val1[248]
+rec2_predicted_int_reg_val1 = w_bal_int_reg_val1[846]-w_bal_int_reg_val1[602]
+
+rec1_predicted_int_reg_val2 = w_bal_int_reg_val2[319]-w_bal_int_reg_val2[282]
+rec2_predicted_int_reg_val2 = w_bal_int_reg_val2[423]-w_bal_int_reg_val2[388]
+
+# Predicted by integral algorithm with fitted tau
 rec1_predicted_int_val1 = w_bal_int_val1[488]-w_bal_int_val1[248]
 rec2_predicted_int_val1 = w_bal_int_val1[846]-w_bal_int_val1[602]
 
@@ -203,19 +225,23 @@ rec2_predicted_biexp_val2 = w_bal_biexp_val2[423]-w_bal_biexp_val2[388]
 
 actual_recs = [rec1_actual_val1, rec2_actual_val1, rec1_actual_val2, rec2_actual_val2]
 predicted_ode_recs = [rec1_predicted_ode_val1, rec2_predicted_ode_val1, rec1_predicted_ode_val2, rec2_predicted_ode_val2]
+predicted_ode_reg_recs = [rec1_predicted_ode_reg_val1, rec2_predicted_ode_reg_val1, rec1_predicted_ode_reg_val2, rec2_predicted_ode_reg_val2]
 predicted_int_recs = [rec1_predicted_int_val1, rec2_predicted_int_val1, rec1_predicted_int_val2, rec2_predicted_int_val2]
+predicted_int_reg_recs = [rec1_predicted_int_reg_val1, rec2_predicted_int_reg_val1, rec1_predicted_int_reg_val2, rec2_predicted_int_reg_val2]
 predicted_bartram_recs = [rec1_predicted_bartram_val1, rec2_predicted_bartram_val1, rec1_predicted_bartram_val2, rec2_predicted_bartram_val2]
 predicted_biexp_recs = [rec1_predicted_biexp_val1, rec2_predicted_biexp_val1, rec1_predicted_biexp_val2, rec2_predicted_biexp_val2]
 
 width = 0.1
 x = np.arange(4)
-plt.bar(x-0.2, np.array(actual_recs)/w_prime*100, width)
-plt.bar(x-0.1, np.array(predicted_ode_recs)/w_prime*100, width)
+plt.bar(x-0.3, np.array(actual_recs)/w_prime*100, width)
+plt.bar(x-0.2, np.array(predicted_ode_recs)/w_prime*100, width)
+plt.bar(x-0.1, np.array(predicted_ode_reg_recs)/w_prime*100, width)
 plt.bar(x, np.array(predicted_int_recs)/w_prime*100, width)
-plt.bar(x+0.1, np.array(predicted_bartram_recs)/w_prime*100, width)
-plt.bar(x+0.2, np.array(predicted_biexp_recs)/w_prime*100, width)
+plt.bar(x+0.1, np.array(predicted_int_reg_recs)/w_prime*100, width)
+plt.bar(x+0.2, np.array(predicted_bartram_recs)/w_prime*100, width)
+plt.bar(x+0.3, np.array(predicted_biexp_recs)/w_prime*100, width)
 plt.xticks(x, ['Recovery 1: 240s', 'Recovery 2: 240s', 'Recovery 1: 30s', 'Recovery 2: 30s'])
-plt.legend(['Actual', 'ODE', 'Integral', 'Bartram', 'Bi-exp exponential'])
+plt.legend(['Actual', 'ODE', 'ODE with fitted tau', 'Integral', 'Integral with fitted tau', 'Bartram', 'Bi-exp exponential'])
 plt.ylabel("W' reconstitution (%)")
 plt.title("W' reconstitution")
 plt.show()
