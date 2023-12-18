@@ -1,9 +1,10 @@
-from activity_reader import ActivityReader
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from activity_reader import ActivityReader
 from w_bal import *
 from plotting import *
-import matplotlib.pyplot as plt
-import pandas as pd
 
 # Read the validation tests
 val_test_1 = ActivityReader("Validation_test_240s_rec.tcx")

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+
 from scipy.optimize import curve_fit
 from w_bal import *
 from activity_reader import *

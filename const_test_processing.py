@@ -1,9 +1,10 @@
-from activity_reader import ActivityReader
 import numpy as np
+import matplotlib.pyplot as plt
+
+from activity_reader import ActivityReader
+from plotting import plot_regression
 from regression import *
 from w_bal import *
-import matplotlib.pyplot as plt
-from plotting import plot_regression
 
 # Read the constant power tests
 test1_activity = ActivityReader("300W_test.tcx")
