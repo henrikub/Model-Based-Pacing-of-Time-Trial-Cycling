@@ -124,35 +124,6 @@ def w_prime_balance_bartram(power, cp, w_prime):
     return w_prime_balance
 
 
-def w_prime_balance_bi_exp(power, cp, w_prime, tau_dynamic=False, tau_value=None, *args, **kwargs):
-    w_prime_balance = []
-    FC_bal = []
-    SC_bal = []
-    FC_amp = 0.365*w_prime
-    SC_amp = 0.635*w_prime
-    tau_fc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=True)
-    tau_sc = get_bi_exp_tau_method(power, cp, tau_dynamic, tau_value, fast_component=False)
-    fc = 4.4
-    sc = 1.1
-
-    for t in range(len(power)):
-        w_prime_exp_sum = 0
-        FC_exp_sum = 0
-        SC_exp_sum = 0
-
-        for u, p in enumerate(power[: t + 1]):
-            w_prime_exp = max(0, p - cp)
-            FC_exp_sum += w_prime_exp * (fc * np.power(np.e, (u - t) / tau_fc(t)))
-            SC_exp_sum += w_prime_exp * (sc * np.power(np.e, (u - t) / tau_sc(t)))
-        
-        w_prime_exp_sum = FC_exp_sum + SC_exp_sum
-        w_prime_balance.append(w_prime - w_prime_exp_sum)
-        FC_bal.append(FC_amp - FC_exp_sum)
-        SC_bal.append(SC_amp - SC_exp_sum)
-
-    return w_prime_balance, FC_bal, SC_bal
-
-
 # The functions for W'balance that use regression and fitted parameters
 def w_prime_balance_bi_exp_regression(power, cp, w_prime, fc, sc):
 

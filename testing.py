@@ -13,29 +13,29 @@ w_prime = 26630
 act = ActivityReader("Validation_test_240s_rec.tcx")
 act.remove_unactive_period(900)
 
-test_power = 100*[400] + 100*[290] + 100*[280] + 100*[250] + 100*[240]
-test_time = np.arange(0,500)
+test_power = 400*[400] + 1000*[200]
+test_time = np.arange(0,1400)
 
 data = pd.DataFrame(dict(power=test_power), index=test_time)
 
 # w_bal_bi_exp, FC_bal, SC_bal = w_prime_bal_dynamic_bi_exp(data["power"], cp, w_prime)
 
-w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
+#w_bal_bi_exp, FC_bal, SC_bal = w_prime_balance_bi_exp(data["power"], cp, w_prime)
 w_bal_ode = w_prime_balance_ode(data["power"], cp, w_prime)
 w_bal_bart = w_prime_balance_bartram(data["power"], cp, w_prime)
 w_bal_int = w_prime_balance_integral(data["power"], cp, w_prime, tau_dynamic=True)
 
 
-plt.subplot(2,1,1)
-plt.plot(w_bal_bi_exp)
+#plt.subplot(2,1,1)
+#plt.plot(w_bal_bi_exp)
 plt.plot(w_bal_ode)
 plt.legend(["Bi exp", "ode"])
 
-plt.subplot(2,1,2)
-plt.plot(FC_bal)
-plt.plot(SC_bal)
-plt.legend(['FC bal', 'SC bal'])
-plt.show()
+# plt.subplot(2,1,2)
+# plt.plot(FC_bal)
+# plt.plot(SC_bal)
+# plt.legend(['FC bal', 'SC bal'])
+# plt.show()
 
 # plt.subplot(3,1,3)
 # plt.plot(tau_fc_dynamic)
